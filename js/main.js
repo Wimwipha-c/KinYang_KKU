@@ -45,11 +45,14 @@
   $("#areaSel").addEventListener("change", e => list.setArea(e.target.value));
   $("#sortSel").addEventListener("change", e => list.setSort(e.target.value));
 
-  // ปุ่มเซียมซีลอย แสดงเมื่อเลื่อนผ่าน hero
+  // ปุ่มเซียมซีลอย: แสดงเมื่อเลื่อนผ่าน hero และซ่อนเมื่อถึง footer (ไม่ให้บังข้อความด้านล่าง)
   if ("IntersectionObserver" in window) {
-    new IntersectionObserver(([entry]) => {
-      $("#fab").classList.toggle("is-visible", !entry.isIntersecting);
-    }, { rootMargin: "-64px 0px 0px 0px" }).observe($("#heroActions"));
+    let pastHero = false, atFooter = false;
+    const update = () => $("#fab").classList.toggle("is-visible", pastHero && !atFooter);
+    new IntersectionObserver(([entry]) => { pastHero = !entry.isIntersecting; update(); },
+      { rootMargin: "-64px 0px 0px 0px" }).observe($("#heroActions"));
+    new IntersectionObserver(([entry]) => { atFooter = entry.isIntersecting; update(); })
+      .observe($(".site-footer"));
   }
 
   $("#year").textContent = new Date().getFullYear() + 543;

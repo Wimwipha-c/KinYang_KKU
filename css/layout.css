@@ -164,16 +164,16 @@
 .review-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr;
+  /* minmax(0, 1fr) กันคอลัมน์ถูกข้อความยาว (เช่นชื่อคณะ) ดันจนกว้างเกินจอ */
+  grid-template-columns: minmax(0, 1fr);
 }
-@media (min-width: 680px) { .review-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 1024px) { .review-grid { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+@media (min-width: 680px) { .review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .review-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
 
 /* ---------- Footer ---------- */
 .site-footer {
   border-top: 1px solid var(--line);
-  /* เว้นด้านล่างพอให้ปุ่มเซียมซีลอยไม่บังข้อความบนมือถือ */
-  padding-block: 16px calc(76px + env(safe-area-inset-bottom, 0px));
+  padding-block: 16px calc(20px + env(safe-area-inset-bottom, 0px));
   color: var(--ink-3);
   font-size: 13px;
   line-height: 1.6;
