@@ -46,6 +46,16 @@
   transition: background-color .15s;
 }
 .icon-btn:hover { background: var(--paper-2); color: var(--ink); }
+.icon-btn[aria-pressed="false"] { color: var(--ink-3); }
+
+/* ปุ่มธีม: ธีมสว่างแสดงพระจันทร์ ธีมมืดแสดงพระอาทิตย์ */
+.theme-btn .icon-sun { display: none; }
+:root[data-theme="dark"] .theme-btn .icon-sun { display: block; }
+:root[data-theme="dark"] .theme-btn .icon-moon { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .theme-btn .icon-sun { display: block; }
+  :root:not([data-theme="light"]) .theme-btn .icon-moon { display: none; }
+}
 
 .text-btn {
   align-self: flex-start;
@@ -367,6 +377,7 @@ select.input, .select {
   background: var(--surface);
   border-bottom: 1px solid var(--line);
 }
+.modal__actions { display: flex; gap: 2px; flex: none; }
 .modal__title { font-size: 22px; font-weight: 700; }
 .modal__sub { margin-top: 2px; color: var(--ink-2); font-size: 15px; }
 .modal__content { padding: 20px 24px 4px; }

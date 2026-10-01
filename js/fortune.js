@@ -27,8 +27,22 @@
 
   const header = (title, sub) => `<div class="modal__head">
       <div><h2 class="modal__title" id="fortuneTitle">${title}</h2>${sub ? `<p class="modal__sub">${sub}</p>` : ""}</div>
-      <button type="button" class="icon-btn" data-act="close-fortune" aria-label="ปิด">${icon("close")}</button>
+      <div class="modal__actions">${soundButton()}
+        <button type="button" class="icon-btn" data-act="close-fortune" aria-label="ปิด">${icon("close")}</button>
+      </div>
     </div>`;
+
+  const soundButton = () => {
+    const on = KY.sound.isEnabled();
+    return `<button type="button" class="icon-btn" id="soundBtn" data-act="sound" aria-pressed="${on}" aria-label="เสียงเซียมซี">${icon(on ? "volume" : "volume-off")}</button>`;
+  };
+
+  function toggleSound() {
+    KY.sound.toggle();
+    const btn = $("#soundBtn");
+    if (btn) btn.outerHTML = soundButton();
+    const fresh = $("#soundBtn"); if (fresh) fresh.focus();
+  }
 
   function slipHtml(c) {
     const m = c.menu, cat = CATEGORIES[m.cat];
@@ -128,10 +142,13 @@
       const sel = $("#fortuneArea");
       if (sel) { fs.area = sel.value; storage.set("kky_area", fs.area); }
       fs.step = "shake"; render();
-      await sleep(reducedMotion ? 300 : 1600);
+      const shakeMs = reducedMotion ? 300 : 1600;
+      KY.sound.rattle(shakeMs / 1000);   // ต้องเรียกก่อน await แรก เพื่อให้นับเป็นการกดของผู้ใช้
+      await sleep(shakeMs);
       const tube = $("#tube"), drop = $("#drop");
       if (tube) tube.classList.remove("is-shaking");
       if (drop && !reducedMotion) drop.classList.add("is-dropping");
+      KY.sound.drop();
       await sleep(reducedMotion ? 0 : 650);
 
       // หลีกเลี่ยงเมนูที่เพิ่งสุ่มได้ 3 ครั้งล่าสุด
@@ -148,6 +165,7 @@
 
       fs.current = { menu, line: pick(menu.lines), color: pick(LUCKY_COLORS), number: 1 + Math.floor(Math.random() * 99) };
       fs.step = "result"; render();
+      KY.sound.chime();
       const body = $("#fortuneBody"); body.scrollTop = 0;
       const first = body.querySelector(".modal__foot .btn"); if (first) first.focus({ preventScroll: true });
     } catch (e) {
@@ -172,5 +190,5 @@
     return { menu: fs.current.menu.name, cat: fs.current.menu.cat, loc: areaLoc(fs.area), area: areaName(fs.area) };
   }
 
-  KY.fortune = { open, close, shake, change, share, toggleFilter, reviewPrefill, areaName, areaLoc };
+  KY.fortune = { open, close, shake, change, share, toggleFilter, toggleSound, reviewPrefill, areaName, areaLoc };
 })(window.KY = window.KY || {});

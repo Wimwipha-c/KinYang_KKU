@@ -11,6 +11,8 @@
     "fortune-change":      () => fortune.change(),
     "fortune-share":       () => fortune.share(),
     "fortune-filter":      (el, v) => fortune.toggleFilter(el, v),
+    "sound":               () => fortune.toggleSound(),
+    "theme":               () => KY.theme.toggle(),
     "review":              () => reviewForm.open(),
     "close-review":        () => reviewForm.close(),
     "review-from-fortune": () => { const pre = fortune.reviewPrefill(); fortune.close(); reviewForm.open(pre); },
