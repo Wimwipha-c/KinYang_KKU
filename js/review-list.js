@@ -150,6 +150,12 @@
     render();
   }
   function setQuery(q) { view.q = q; render(); }
+  // ค้นหาจากภายนอก (เช่นกดเมนูยอดฮิต): ล้างตัวกรองอื่นแล้วใส่คำค้นในช่องค้นหา
+  function search(q) {
+    Object.assign(view, { loc: "all", area: "", q });
+    $("#q").value = q;
+    render();
+  }
   function setSort(s) { view.sort = s; render(); }
   function clear() {
     Object.assign(view, { loc: "all", area: "", q: "" });
@@ -157,5 +163,5 @@
     render();
   }
 
-  KY.list = { render, setLocation, setArea, setQuery, setSort, clear, categoryOf };
+  KY.list = { render, setLocation, setArea, setQuery, search, setSort, clear, categoryOf };
 })(window.KY = window.KY || {});

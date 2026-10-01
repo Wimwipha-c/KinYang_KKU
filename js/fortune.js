@@ -166,6 +166,7 @@
       if (fs.dailyBadge) storage.set("kky_day", today);
 
       fs.current = randomFortune(menu);
+      if (fs.dailyBadge && KY.trending) KY.trending.recordDraw(menu.name);   // นับเข้ายอดฮิตแค่ครั้งแรกของวัน
       saveToday();
       renderHero();
       fs.step = "result"; render();

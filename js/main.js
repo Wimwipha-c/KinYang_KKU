@@ -2,7 +2,7 @@
 (function (KY) {
   "use strict";
   const { $ } = KY.utils;
-  const { list, fortune, reviewForm, reviews } = KY;
+  const { list, fortune, reviewForm, reviews, trending } = KY;
 
   const actions = {
     "fortune":             () => fortune.open(),
@@ -21,6 +21,7 @@
     "loc":                 (el, v) => list.setLocation(v),
     "clear":               () => list.clear(),
     "retry":               () => reviews.retry(),
+    "trend": (el, v) => { list.search(v); $("#reviews").scrollIntoView(); },
     "more": el => {
       const text = el.previousElementSibling;
       const open = text.classList.toggle("is-open");
@@ -66,5 +67,5 @@
   $("#year").textContent = new Date().getFullYear() + 543;
 
   list.render();
-  reviews.init(list.render);
+  reviews.init(() => { list.render(); trending.schedule(); });
 })(window.KY = window.KY || {});

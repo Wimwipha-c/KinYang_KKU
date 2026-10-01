@@ -111,6 +111,17 @@
       </div>
     </section>
 
+    <!-- เมนูยอดฮิตประจำสัปดาห์: สร้างโดย js/trending.js (ซ่อนไว้จนกว่าจะมีข้อมูล) -->
+    <section class="section section--trending container" id="trending" aria-labelledby="trendingTitle" hidden>
+      <div class="section__head">
+        <div>
+          <h2 class="section__title" id="trendingTitle">ช่วงนี้ชาว มข. ฮิตกินอะไร</h2>
+          <p class="section__meta">จัดอันดับจากรีวิวและผลเซียมซีใน 7 วันล่าสุด</p>
+        </div>
+      </div>
+      <ol class="trend-list" id="trendList"></ol>
+    </section>
+
     <section class="section container" id="reviews" aria-labelledby="reviewsTitle">
       <div class="section__head">
         <div>
@@ -170,6 +181,7 @@
   <script src="js/sound.js" defer></script>
   <script src="js/reviews-store.js" defer></script>
   <script src="js/review-list.js" defer></script>
+  <script src="js/trending.js" defer></script>
   <script src="js/share-image.js" defer></script>
   <script src="js/fortune.js" defer></script>
   <script src="js/review-form.js" defer></script>

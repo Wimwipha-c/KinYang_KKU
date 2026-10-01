@@ -112,5 +112,8 @@
     return false;
   }
 
-  KY.reviews = { state: store, all, init, retry, add };
+  // ตัวเชื่อม Supabase สำหรับส่วนอื่นที่ใช้ฐานข้อมูลเดียวกัน (null ถ้าไม่ได้เชื่อม)
+  const db = () => client;
+
+  KY.reviews = { state: store, all, init, retry, add, db };
 })(window.KY = window.KY || {});
