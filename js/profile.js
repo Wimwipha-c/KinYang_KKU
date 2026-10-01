@@ -167,13 +167,14 @@
     loadMine();
   }
 
-  const isMine = r => !!(auth.user && r && r.user_id === auth.user.id);
+  // รีวิวของฉัน = โพสต์ตอนเข้าสู่ระบบด้วยบัญชีนี้ หรือรีวิวที่เก็บไว้ในเครื่องนี้ (ลบได้ แต่แก้ไม่ได้)
+  const isMine = r => !!(r && (r._local || (auth.user && r.user_id === auth.user.id)));
   const findReview = id => KY.reviews.all().find(r => String(r.id) === id) ||
     (Array.isArray(pf.mine) ? pf.mine.find(r => String(r.id) === id) : null);
 
   function edit(id) {
     const r = findReview(id);
-    if (!isMine(r)) return;
+    if (!isMine(r) || r._local) return;
     close();
     KY.reviewForm.open({ edit: r });
   }
@@ -183,7 +184,7 @@
     if (!isMine(r)) return;
     const ok = await KY.ui.confirm({
       title: "ลบรีวิวนี้?",
-      body: `<b>${esc(r.menu)}</b> · ${esc(r.shop)}<br>รีวิวจะหายจากเว็บของทุกคน และกู้คืนไม่ได้`,
+      body: `<b>${esc(r.menu)}</b> · ${esc(r.shop)}<br>${r._local ? "รีวิวนี้เก็บไว้ในเครื่องนี้เท่านั้น ลบแล้วกู้คืนไม่ได้" : "รีวิวจะหายจากเว็บของทุกคน และกู้คืนไม่ได้"}`,
       confirmText: "ลบรีวิว", danger: true
     });
     if (!ok) return;

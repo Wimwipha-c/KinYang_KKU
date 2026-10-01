@@ -122,6 +122,13 @@
   }
 
   async function remove(id) {
+    // รีวิวที่เก็บไว้ในเครื่องนี้ (ตอนเชื่อมฐานข้อมูลกลางไม่ได้) ลบจาก localStorage ได้เลย
+    if (String(id).startsWith("local-")) {
+      store.local = store.local.filter(r => r.id !== id);
+      storage.set(LOCAL_KEY, store.local);
+      onChange();
+      return;
+    }
     const { data, error } = await client.from(TABLE).delete().eq("id", id).select("id");
     if (error) throw error;
     if (!data.length) throw new Error("not allowed");
