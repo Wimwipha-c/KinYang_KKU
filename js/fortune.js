@@ -82,10 +82,11 @@
             <div class="toggle-group">${FORTUNE_FILTERS.map(([k, l]) =>
               `<button type="button" class="toggle" data-act="fortune-filter" data-v="${k}" aria-pressed="${fs.filters.has(k)}">${icon("check", "toggle__check")}${l}</button>`).join("")}
             </div>
+            <p class="${filterHint().n ? "field__hint" : "field__error"}" id="filterHint" aria-live="polite">${filterHint().text}</p>
           </div>
         </div>
         <div class="modal__foot">
-          <button type="button" class="btn btn-primary btn-lg btn-block" data-act="shake">${icon("sticks")}เขย่าเซียมซี</button>
+          <button type="button" class="btn btn-primary btn-lg btn-block" data-act="shake"${filterHint().n ? "" : " disabled"}>${icon("sticks")}เขย่าเซียมซี</button>
           <p class="fineprint">คำทำนายมีไว้เพื่อความบันเทิงเท่านั้น</p>
         </div>`;
       return;
@@ -132,14 +133,33 @@
   }
   const close = () => closeModal("fortuneModal");
 
+  // งบหลักสิบเป็นเงื่อนไขบังคับ ส่วนสไตล์อื่น (ของหวาน ซดน้ำ อีสาน) ตรงข้อใดข้อหนึ่งก็พอ
+  function poolFor(filters) {
+    const styles = [...filters].filter(t => t !== "b");
+    return MENUS.filter(m =>
+      (!filters.has("b") || m.tags.includes("b")) &&
+      (!styles.length || styles.some(t => m.tags.includes(t))));
+  }
+
+  function filterHint() {
+    const n = poolFor(fs.filters).length;
+    if (!fs.filters.size) return { n, text: `สุ่มจากทั้งหมด ${n} เมนู` };
+    return { n, text: n ? `มี ${n} เมนูที่ตรงกับที่เลือก` : "ไม่มีเมนูที่ตรงกับที่เลือก ลองเอาบางตัวเลือกออก" };
+  }
+
   function toggleFilter(btn, key) {
     fs.filters.has(key) ? fs.filters.delete(key) : fs.filters.add(key);
     btn.setAttribute("aria-pressed", String(fs.filters.has(key)));
+    const h = filterHint(), el = $("#filterHint"), go = $('#fortuneBody [data-act="shake"]');
+    if (el) { el.textContent = h.text; el.classList.toggle("field__error", !h.n); el.classList.toggle("field__hint", !!h.n); }
+    if (go) go.disabled = !h.n;
   }
 
   function change() { fs.step = "pick"; render(); const s = $("#fortuneArea"); if (s) s.focus(); }
 
   async function shake() {
+    const pool = poolFor(fs.filters);
+    if (!pool.length) { toast("ไม่มีเมนูที่ตรงกับที่เลือก ลองเอาบางตัวเลือกออก"); return; }
     try {
       const sel = $("#fortuneArea");
       if (sel) { fs.area = sel.value; storage.set("kky_area", fs.area); }
@@ -155,9 +175,8 @@
 
       // หลีกเลี่ยงเมนูที่เพิ่งสุ่มได้ 3 ครั้งล่าสุด
       const history = storage.get("kky_hist", []);
-      const pool = MENUS.filter(m => [...fs.filters].every(t => m.tags.includes(t)));
       let candidates = pool.filter(m => !history.includes(m.name));
-      if (!candidates.length) candidates = pool.length ? pool : MENUS;
+      if (!candidates.length) candidates = pool;
       const menu = pick(candidates);
       storage.set("kky_hist", [menu.name, ...history].slice(0, 3));
 

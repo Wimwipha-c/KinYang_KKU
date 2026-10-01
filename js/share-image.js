@@ -94,7 +94,7 @@
     const [catColor, catBg] = CAT_COLORS[m.cat] || CAT_COLORS.other;
     const [catIcon, logoIcon] = await Promise.all([
       iconImage(CATEGORIES[m.cat] ? CATEGORIES[m.cat].icon : "plate", catColor, 88, 1.6),
-      iconImage("sticks", "#FFFFFF", 44, 2)
+      iconImage("logo", "#FFFFFF", 44, 2)
     ]);
 
     const canvas = document.createElement("canvas");
