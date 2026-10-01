@@ -96,7 +96,7 @@
       body.innerHTML = `<div class="modal__content shake-stage">
           <h2 class="modal__title" id="fortuneTitle">กำลังเขย่าเซียมซี…</h2>
           <div class="shaker" aria-hidden="true">
-            <div class="shaker__sticks"><i></i><i></i><i></i><i></i><i></i></div>
+            <div class="shaker__sticks is-shaking" id="sticks"><i></i><i></i><i></i><i></i><i></i></div>
             <div class="shaker__tube is-shaking" id="tube"><span>กินหยัง</span></div>
             <div class="shaker__drop" id="drop"></div>
           </div>
@@ -164,14 +164,15 @@
       const sel = $("#fortuneArea");
       if (sel) { fs.area = sel.value; storage.set("kky_area", fs.area); }
       fs.step = "shake"; render();
-      const shakeMs = reducedMotion ? 300 : 1600;
+      const shakeMs = reducedMotion ? 1300 : 1600;   // ลดการเคลื่อนไหว: เขย่าเบาๆ แต่ยังต้องเห็นว่ากำลังสุ่ม
       KY.sound.rattle(shakeMs / 1000);   // ต้องเรียกก่อน await แรก เพื่อให้นับเป็นการกดของผู้ใช้
       await sleep(shakeMs);
       const tube = $("#tube"), drop = $("#drop");
       if (tube) tube.classList.remove("is-shaking");
-      if (drop && !reducedMotion) drop.classList.add("is-dropping");
+      const sticks = $("#sticks"); if (sticks) sticks.classList.remove("is-shaking");
+      if (drop) drop.classList.add("is-dropping");
       KY.sound.drop();
-      await sleep(reducedMotion ? 0 : 650);
+      await sleep(reducedMotion ? 450 : 650);
 
       // หลีกเลี่ยงเมนูที่เพิ่งสุ่มได้ 3 ครั้งล่าสุด
       const history = storage.get("kky_hist", []);
