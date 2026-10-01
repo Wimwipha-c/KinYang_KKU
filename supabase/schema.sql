@@ -197,3 +197,59 @@ create policy "Admins can delete reports"
   on public.review_reports for delete
   to authenticated
   using (public.is_admin());
+
+
+-- ===================================================================
+-- โปรไฟล์ และรีวิวของฉัน (แก้/ลบรีวิวตัวเอง)
+-- ต้องรันส่วน "ระบบสมาชิก" ก่อน รันซ้ำได้ ไม่ทำให้ข้อมูลเดิมหาย
+-- ===================================================================
+
+-- โปรไฟล์: เห็นและแก้ได้เฉพาะเจ้าของ (ชื่อ/คณะที่แสดงบนรีวิวถูกคัดลอกไปเก็บในรีวิวตอนโพสต์)
+-- year: 1-6 = ชั้นปี, grad = ป.โท/เอก, staff = บุคลากร, alumni = ศิษย์เก่า
+create table if not exists public.profiles (
+  id            uuid primary key default auth.uid() references auth.users (id) on delete cascade,
+  display_name  text not null check (char_length(btrim(display_name)) between 1 and 30),
+  faculty       text check (faculty is null or char_length(faculty) between 1 and 80),
+  year          text check (year is null or year in ('1', '2', '3', '4', '5', '6', 'grad', 'staff', 'alumni')),
+  updated_at    timestamptz not null default now()
+);
+alter table public.profiles enable row level security;
+grant select, insert, update on public.profiles to authenticated;
+
+drop policy if exists "Users manage own profile" on public.profiles;
+create policy "Users manage own profile"
+  on public.profiles for all
+  to authenticated
+  using (id = auth.uid())
+  with check (id = auth.uid());
+
+-- รีวิวจำว่าใครเขียน (เฉพาะรีวิวที่โพสต์ตอนเข้าสู่ระบบ รีวิวของ guest เป็น null)
+alter table public.reviews add column if not exists user_id uuid default auth.uid() references auth.users (id) on delete set null;
+alter table public.reviews add column if not exists faculty text check (faculty is null or char_length(faculty) <= 80);
+alter table public.reviews add column if not exists year text check (year is null or year in ('1', '2', '3', '4', '5', '6', 'grad', 'staff', 'alumni'));
+alter table public.reviews add column if not exists updated_at timestamptz;
+create index if not exists reviews_user_id_idx on public.reviews (user_id);
+
+-- ห้ามโพสต์รีวิวในนามคนอื่น (ส่วนบนของไฟล์สร้าง policy นี้แบบเดิมไว้ ส่วนนี้แทนที่ด้วยแบบที่เช็ก user_id)
+drop policy if exists "Anyone can post reviews" on public.reviews;
+create policy "Anyone can post reviews"
+  on public.reviews for insert
+  to anon, authenticated
+  with check (user_id is null or user_id = auth.uid());
+
+-- เจ้าของแก้ได้เฉพาะเนื้อหารีวิว (แก้ id, user_id, created_at ไม่ได้)
+revoke update on public.reviews from anon, authenticated;
+grant update (menu, shop, loc, area, price, rating, text, name, cat, faculty, year, updated_at) on public.reviews to authenticated;
+
+drop policy if exists "Authors can edit own reviews" on public.reviews;
+create policy "Authors can edit own reviews"
+  on public.reviews for update
+  to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+drop policy if exists "Authors can delete own reviews" on public.reviews;
+create policy "Authors can delete own reviews"
+  on public.reviews for delete
+  to authenticated
+  using (user_id = auth.uid());

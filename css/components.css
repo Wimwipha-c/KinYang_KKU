@@ -317,6 +317,8 @@ select.input, .select {
 .review-card .text-btn { margin: -10px 0 14px; }
 .review-card__end { display: flex; align-items: center; gap: 2px; flex: none; margin-right: -8px; }
 .review-card__end .price { margin-right: 4px; }
+.review-card__meta { display: flex; flex-direction: column; min-width: 0; line-height: 1.45; }
+.review-card__who { color: var(--ink-2); font-weight: 500; overflow-wrap: anywhere; }
 .review-card__by { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--ink-3); }
 .avatar {
   display: grid;
@@ -550,3 +552,19 @@ select.input, .select {
   .hide-sm { display: none; }
   .header-review, .account-slot .google-btn { width: 40px; padding: 0; }
 }
+
+/* ---------- โปรไฟล์ ---------- */
+.byline-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-2);
+}
+.byline-note .icon { width: 18px; height: 18px; margin-top: 2px; color: var(--brand); }
+.byline-note b { color: var(--ink); }
+.byline-note .text-btn { display: inline; padding: 0; margin-left: 4px; font-size: inherit; }
+.callout--flush { margin-top: 0; }
+.skeleton--sm { height: 120px; }
