@@ -137,8 +137,8 @@
 @media (max-width: 919px) { .hero__art { max-width: 300px; } }
 
 /* ---------- Section ---------- */
-.section { padding-block: 48px 72px; }
-@media (min-width: 768px) { .section { padding-block: 64px 96px; } }
+.section { padding-block: 48px 40px; }
+@media (min-width: 768px) { .section { padding-block: 64px 56px; } }
 
 .section__head {
   display: flex;
@@ -172,16 +172,18 @@
 /* ---------- Footer ---------- */
 .site-footer {
   border-top: 1px solid var(--line);
-  padding-block: 32px 96px;
+  /* เว้นด้านล่างพอให้ปุ่มเซียมซีลอยไม่บังข้อความบนมือถือ */
+  padding-block: 16px calc(76px + env(safe-area-inset-bottom, 0px));
   color: var(--ink-3);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.6;
 }
 .site-footer__inner {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: flex-end;
-  gap: 16px 32px;
+  align-items: baseline;
+  gap: 2px 24px;
 }
-.site-footer .logo__text { color: var(--ink); margin-bottom: 4px; }
-@media (min-width: 768px) { .site-footer { padding-bottom: 40px; } }
+.site-footer .logo__text { color: var(--ink); }
+@media (min-width: 768px) { .site-footer { padding-block: 24px; } }

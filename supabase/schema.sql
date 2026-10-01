@@ -1,0 +1,42 @@
+-- กินหยัง KKU: ตารางรีวิว
+-- วิธีใช้: Supabase Dashboard → SQL Editor → New query → วางทั้งไฟล์ → Run (รันครั้งเดียว)
+
+create table if not exists public.reviews (
+  id          uuid primary key default gen_random_uuid(),
+  menu        text not null check (char_length(menu) between 1 and 60),
+  shop        text not null check (char_length(shop) between 1 and 60),
+  loc         text not null check (loc in ('in', 'out')),
+  area        text not null check (char_length(area) between 1 and 80),
+  price       integer check (price is null or price between 0 and 9999),
+  rating      smallint not null check (rating between 1 and 5),
+  text        text not null check (char_length(text) between 5 and 500),
+  name        text not null default 'เพื่อน มข.' check (char_length(name) between 1 and 30),
+  cat         text not null default 'other'
+              check (cat in ('noodle', 'rice', 'isan', 'grill', 'sweet', 'fusion', 'other')),
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists reviews_created_at_idx on public.reviews (created_at desc);
+
+-- สิทธิ์: ทุกคนอ่านและโพสต์ได้ แต่แก้ไขหรือลบไม่ได้ (ไม่มี policy สำหรับ update/delete)
+-- ผู้ดูแลลบรีวิวได้ที่ Table Editor ในหน้า Supabase
+alter table public.reviews enable row level security;
+
+drop policy if exists "Anyone can read reviews" on public.reviews;
+create policy "Anyone can read reviews"
+  on public.reviews for select
+  to anon, authenticated
+  using (true);
+
+drop policy if exists "Anyone can post reviews" on public.reviews;
+create policy "Anyone can post reviews"
+  on public.reviews for insert
+  to anon, authenticated
+  with check (true);
+
+-- เปิด real-time ให้รีวิวใหม่เด้งขึ้นในเครื่องคนอื่นทันที
+do $$
+begin
+  alter publication supabase_realtime add table public.reviews;
+exception when duplicate_object then null;
+end $$;

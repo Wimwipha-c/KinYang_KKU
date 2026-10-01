@@ -1,12 +1,13 @@
 /*
  * ชั้นข้อมูลรีวิว
- * - ถ้ารันใน Claude Artifact ที่มีฐานข้อมูลกลาง (window.claude.use("db")) จะอ่าน/เขียนรีวิวร่วมกันได้
- * - ถ้าไม่มี จะเก็บรีวิวไว้ใน localStorage ของเครื่องผู้ใช้
+ * - ถ้าตั้งค่า Supabase ไว้ใน js/config.js รีวิวจะเก็บในฐานข้อมูลกลาง ทุกคนเห็นร่วมกันแบบ real-time
+ * - ถ้าเชื่อมไม่ได้ จะเก็บรีวิวไว้ใน localStorage ของเครื่องผู้ใช้แทน
  */
 (function (KY) {
   "use strict";
   const { storage } = KY.utils;
   const LOCAL_KEY = "kky_reviews_local";
+  const TABLE = "reviews";
 
   const store = {
     status: "ok",      // ok | loading | error
@@ -15,7 +16,20 @@
     local: storage.get(LOCAL_KEY, [])
   };
 
-  let db = null, unsubscribe = null, onChange = () => {};
+  let client = null, channel = null, onChange = () => {};
+
+  // แปลงแถวจากฐานข้อมูลให้อยู่ในรูปแบบที่หน้าเว็บใช้
+  const fromRow = row => ({
+    ...row,
+    price: row.price == null ? "" : row.price,
+    createdAt: Date.parse(row.created_at)
+  });
+
+  function upsertRemote(row) {
+    const review = fromRow(row);
+    store.remote = [review, ...store.remote.filter(r => r.id !== review.id)];
+    onChange();
+  }
 
   function all() {
     const seen = new Set(), out = [];
@@ -25,47 +39,71 @@
     return out;
   }
 
-  function subscribe() {
-    if (!db) return;
-    if (unsubscribe) { try { unsubscribe(); } catch (e) { /* ignore */ } unsubscribe = null; }
+  async function load() {
     store.status = "loading"; onChange();
-    try {
-      unsubscribe = db.collection("reviews").orderBy("createdAt", "desc").limit(300).onSnapshot(
-        snap => {
-          store.remote = snap.docs.filter(d => d.exists).map(d => ({ ...d.data(), id: d.id }));
-          store.status = "ok"; onChange();
-        },
-        err => { console.error("reviews snapshot", err); store.status = "error"; onChange(); }
-      );
-    } catch (e) {
-      console.error("reviews subscribe", e);
+    const { data, error } = await client
+      .from(TABLE)
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(300);
+    if (error) {
+      console.error("load reviews", error);
       store.status = "error"; onChange();
+      return;
     }
+    store.remote = data.map(fromRow);
+    store.status = "ok"; onChange();
+  }
+
+  function listen() {
+    if (channel) client.removeChannel(channel);
+    channel = client
+      .channel("reviews-feed")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: TABLE }, payload => upsertRemote(payload.new))
+      .on("postgres_changes", { event: "DELETE", schema: "public", table: TABLE }, payload => {
+        store.remote = store.remote.filter(r => r.id !== payload.old.id);
+        onChange();
+      })
+      .subscribe();
   }
 
   async function init(changeHandler) {
     onChange = changeHandler || onChange;
+    const cfg = window.KY_CONFIG || {};
+    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase) {
+      if (cfg.supabaseUrl) console.warn("Supabase library not loaded; using local storage");
+      return;
+    }
     try {
-      if (!window.claude || !window.claude.use) return;
-      const handle = await window.claude.use("db");
-      if (!handle) return;
-      db = handle; store.shared = true;
-      subscribe();
+      client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+        auth: { persistSession: false }
+      });
+      store.shared = true;
+      await load();
+      listen();
     } catch (e) {
-      console.error("db init", e);
+      console.error("supabase init", e);
+      store.status = "error"; onChange();
     }
   }
 
   function retry() {
-    if (db) subscribe();
+    if (client) load();
     else { store.status = "ok"; onChange(); }
   }
 
-  // คืนค่า true ถ้าบันทึกลงฐานข้อมูลกลางได้
+  // คืนค่า true ถ้าบันทึกลงฐานข้อมูลกลางได้ (ถ้าล้มเหลวจะ throw ให้ฟอร์มแสดงข้อความ)
   async function add(review) {
-    if (db) {
-      try { await db.collection("reviews").add(review); return true; }
-      catch (e) { console.error("db add", e); }
+    if (client) {
+      const row = {
+        menu: review.menu, shop: review.shop, loc: review.loc, area: review.area,
+        price: review.price === "" ? null : review.price,
+        rating: review.rating, text: review.text, name: review.name, cat: review.cat
+      };
+      const { data, error } = await client.from(TABLE).insert(row).select().single();
+      if (error) throw error;
+      upsertRemote(data);
+      return true;
     }
     const id = "local-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7);
     store.local = [{ ...review, id, _local: true }, ...store.local].slice(0, 100);
