@@ -568,3 +568,31 @@ select.input, .select {
 .byline-note .text-btn { display: inline; padding: 0; margin-left: 4px; font-size: inherit; }
 .callout--flush { margin-top: 0; }
 .skeleton--sm { height: 120px; }
+
+/* ---------- กล่องยืนยัน ---------- */
+.btn-danger { background: var(--danger); color: var(--brand-ink); }
+.btn-danger:hover { filter: brightness(1.08); }
+
+.modal--confirm { z-index: 60; }
+.confirm {
+  max-width: 400px;
+  align-items: center;
+  padding: 28px 24px calc(20px + env(safe-area-inset-bottom, 0px));
+  text-align: center;
+}
+@media (min-width: 640px) { .confirm { padding-bottom: 24px; } }
+.confirm__icon {
+  display: grid;
+  place-items: center;
+  width: 56px; height: 56px;
+  margin-bottom: 14px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  color: var(--ink-2);
+}
+.confirm__icon .icon { width: 26px; height: 26px; }
+.confirm__icon--danger { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+.confirm__title { font-size: 22px; font-weight: 700; }
+.confirm__body { margin-top: 8px; color: var(--ink-2); line-height: 1.7; overflow-wrap: anywhere; }
+.confirm__body b { color: var(--ink); }
+.confirm__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 24px; }

@@ -54,7 +54,5 @@
   border-top: 1px solid var(--line);
 }
 
-.btn-danger { background: var(--danger); color: var(--brand-ink); }
-.btn-danger:hover { filter: brightness(1.08); }
 
 .admin .empty-state .google-btn { min-width: 260px; }

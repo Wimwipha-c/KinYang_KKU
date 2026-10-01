@@ -181,7 +181,12 @@
   async function remove(id) {
     const r = findReview(id);
     if (!isMine(r)) return;
-    if (!confirm(`ลบรีวิว ${r.menu} (${r.shop})?\nรีวิวจะหายจากเว็บของทุกคน และกู้คืนไม่ได้`)) return;
+    const ok = await KY.ui.confirm({
+      title: "ลบรีวิวนี้?",
+      body: `<b>${esc(r.menu)}</b> · ${esc(r.shop)}<br>รีวิวจะหายจากเว็บของทุกคน และกู้คืนไม่ได้`,
+      confirmText: "ลบรีวิว", danger: true
+    });
+    if (!ok) return;
     try {
       await KY.reviews.remove(r.id);
       if (Array.isArray(pf.mine)) { pf.mine = pf.mine.filter(x => x.id !== r.id); if ($("#profileModal").classList.contains("is-open")) renderMine(); }
