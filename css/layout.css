@@ -16,6 +16,8 @@
   gap: 16px;
   height: var(--header-h);
 }
+@media (max-width: 479px) { .site-header__inner { gap: 6px; } }
+.account-slot { display: flex; flex: none; }
 
 .logo { display: inline-flex; align-items: center; gap: 10px; margin-right: auto; }
 .logo__mark {
@@ -181,6 +183,59 @@
 }
 @media (min-width: 680px) { .review-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (min-width: 1024px) { .review-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; } }
+
+/* ---------- เมนูยอดฮิตประจำสัปดาห์ ---------- */
+.section--trending { padding-bottom: 0; }
+@media (min-width: 768px) { .section--trending { padding-bottom: 0; } }
+
+.trend-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 680px) { .trend-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 1024px) { .trend-list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; } }
+
+.trend {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  text-align: left;
+}
+button.trend { transition: border-color .2s, box-shadow .2s, transform .2s var(--ease); }
+button.trend:hover { border-color: var(--line-strong); box-shadow: var(--shadow-2); transform: translateY(-2px); }
+
+.trend__rank {
+  flex: none;
+  min-width: 1ch;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.trend-list li:first-child .trend__rank { color: var(--brand); }
+.trend .cat-badge { flex: none; }
+.trend__body { display: flex; flex-direction: column; min-width: 0; line-height: 1.4; }
+.trend__name { font-weight: 600; overflow-wrap: anywhere; }
+.trend__meta { font-size: 13px; color: var(--ink-3); }
+
+/* จอกว้าง 5 คอลัมน์: วางอันดับกับไอคอนไว้บรรทัดบน ชื่อเมนูจะได้มีที่พอ */
+@media (min-width: 1024px) {
+  .trend { flex-wrap: wrap; align-items: center; align-content: flex-start; padding: 16px; }
+  .trend__body { flex-basis: 100%; }
+}
 
 /* ---------- Footer ---------- */
 .site-footer {

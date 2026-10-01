@@ -17,6 +17,7 @@
 
 ```
 index.html            โครงหน้า + ชุดไอคอน SVG
+admin.html            หน้าผู้ดูแล: ตรวจรายงานรีวิว
 assets/favicon.svg    ไอคอนเว็บ
 css/
   tokens.css          สี ฟอนต์ ขนาด (ธีมสว่าง/มืด) — แก้แบรนด์ที่นี่ที่เดียว
@@ -24,16 +25,24 @@ css/
   layout.css          header, hero, ส่วนรีวิว, footer
   components.css      ปุ่ม ฟอร์ม การ์ด modal toast
   fortune.css         ใบเซียมซีและแอนิเมชันกระบอก
-supabase/schema.sql   สร้างตารางรีวิวและสิทธิ์ในฐานข้อมูล
+  admin.css           หน้าผู้ดูแล
+supabase/schema.sql   สร้างตาราง (รีวิว ผลเซียมซี เมนูโปรด รายงาน ผู้ดูแล) และสิทธิ์ในฐานข้อมูล
 js/
   config.js           ค่าเชื่อมต่อ Supabase
   data.js             เมนูในเซียมซี คณะ/โซน หมวดอาหาร
   utils.js            ฟังก์ชันช่วยทั่วไป
   ui.js               toast และ modal (จัดการโฟกัส/ปุ่ม Esc)
   theme.js            ปุ่มสลับธีมสว่าง/มืด (จำค่าที่ผู้ใช้เลือก)
+  db.js               ตัวเชื่อม Supabase ที่ทุกส่วนใช้ร่วมกัน
+  auth.js             เข้าสู่ระบบด้วย Google (ไม่บังคับ)
   sound.js            เสียงเขย่าเซียมซี สังเคราะห์ด้วย Web Audio API ไม่ใช้ไฟล์เสียง
   reviews-store.js    การอ่าน/บันทึกรีวิว
   review-list.js      แสดงรายการรีวิวและตัวกรอง
+  trending.js         เมนูยอดฮิตประจำสัปดาห์บนหน้าแรก
+  favorites.js        ลิสต์ของฉัน (เมนูโปรด) และสุ่มจากลิสต์
+  report.js           รายงานรีวิว
+  account.js          ปุ่มบัญชีบน header และหน้าต่างบัญชี
+  admin.js            หน้าผู้ดูแล
   share-image.js      วาดรูปใบเซียมซี (PNG 1080×1350) สำหรับแชร์
   fortune.js          เซียมซี
   review-form.js      ฟอร์มเขียนรีวิว
@@ -49,6 +58,56 @@ js/
 
 - ค่าการเชื่อมต่ออยู่ที่ `js/config.js` (ใช้ **anon key** เท่านั้น ห้ามใส่ service_role key)
 - โครงสร้างตารางและสิทธิ์อยู่ที่ `supabase/schema.sql` — รันใน SQL Editor ของ Supabase ครั้งเดียวตอนตั้งโปรเจกต์
-- สิทธิ์: ทุกคนอ่านและโพสต์ได้ แต่แก้ไขหรือลบไม่ได้
-- **ลบรีวิวที่ไม่เหมาะสม:** Supabase Dashboard → Table Editor → `reviews` → เลือกแถว → Delete (รีวิวจะหายจากเว็บทุกเครื่องทันที)
+- สิทธิ์: ทุกคนอ่านและโพสต์ได้ แต่แก้ไขหรือลบไม่ได้ (ยกเว้นผู้ดูแลลบได้ที่หน้า `admin.html`)
+- **ลบรีวิวที่ไม่เหมาะสม:** ที่หน้า `admin.html` หรือ Supabase Dashboard → Table Editor → `reviews` → เลือกแถว → Delete (รีวิวจะหายจากเว็บทุกเครื่องทันที)
 - ถ้าเชื่อมฐานข้อมูลไม่ได้ (เช่น ลบค่าใน `config.js`) เว็บจะกลับไปเก็บรีวิวใน `localStorage` ของแต่ละเครื่อง
+
+## เมนูยอดฮิตประจำสัปดาห์
+
+ส่วน "ช่วงนี้ชาว มข. ฮิตกินอะไร" บนหน้าแรก แสดง 5 อันดับจากข้อมูล 7 วันล่าสุด
+
+- คะแนน = จำนวนรีวิว × 3 + จำนวนครั้งที่ออกเซียมซี × 1 (คำนวณในฟังก์ชัน `weekly_trending` ใน `supabase/schema.sql`)
+- เซียมซีนับเครื่องละครั้งต่อวัน (ครั้งแรกของวัน) สุ่มซ้ำไม่นับเพิ่ม ตาราง `fortune_draws` เก็บแค่ชื่อเมนูกับเวลา
+- กดเมนูที่มีรีวิวเพื่อค้นหารีวิวของเมนูนั้น
+- **ต้องรัน SQL ส่วน "เมนูยอดฮิตประจำสัปดาห์" ใน `supabase/schema.sql` เพิ่มหนึ่งครั้ง** ถ้ายังไม่รัน เว็บจะนับจากรีวิวอย่างเดียวไปก่อน
+- ถ้าไม่ได้เชื่อม Supabase ส่วนนี้จะถูกซ่อน
+- ข้อจำกัด: ไม่มีระบบ login จึงกันคนตั้งใจปั่นยอดเซียมซีไม่ได้ 100%
+
+## เข้าสู่ระบบด้วย Google, ลิสต์ของฉัน และรายงานรีวิว
+
+ทุกคนเข้าเว็บได้ในฐานะ guest เข้าสู่ระบบด้วย Google หรือไม่ก็ได้
+
+| | guest | เข้าสู่ระบบแล้ว |
+|---|---|---|
+| **ลิสต์ของฉัน** (กดหัวใจบนรีวิว/ผลเซียมซี) | เก็บในเครื่องนี้ ล้างข้อมูลเบราว์เซอร์แล้วหาย | เก็บในบัญชี เห็นคนเดียว เปิดเครื่องไหนก็เจอ (ของที่บันทึกตอนเป็น guest จะย้ายเข้าบัญชีให้) |
+| **รายงานรีวิว** (ปุ่มธงบนการ์ดรีวิว) | ไม่ได้ ต้องเข้าสู่ระบบก่อน | ได้ รีวิวละครั้ง เลือกเหตุผล + พิมพ์รายละเอียดได้ |
+
+รายงานไม่ซ่อนรีวิวอัตโนมัติ ผู้ดูแลตรวจที่ `admin.html` แล้วเลือก **ลบรีวิว** หรือ **เก็บรีวิวไว้**
+
+### ตั้งค่าครั้งแรก (ทำครั้งเดียว)
+
+**1. สร้าง OAuth Client ใน Google Cloud** — https://console.cloud.google.com
+1. สร้างโปรเจกต์ใหม่ (หรือใช้ที่มีอยู่)
+2. เมนู **APIs & Services → OAuth consent screen** (บางบัญชีชื่อ **Google Auth Platform**) → เลือก **External** → ใส่ชื่อแอป `กินหยัง KKU` และอีเมลติดต่อ → บันทึก แล้วกด **Publish app** เพื่อให้ทุกคนเข้าสู่ระบบได้
+3. เมนู **Credentials** (หรือ **Clients**) → **Create credentials → OAuth client ID** → ชนิด **Web application**
+   - Authorized JavaScript origins: `https://kinyangkku.vercel.app`
+   - Authorized redirect URIs: `https://kbaizxmsmrppbqdvunle.supabase.co/auth/v1/callback`
+4. คัดลอก **Client ID** และ **Client secret** ไว้
+
+**2. เปิด Google ใน Supabase** — https://supabase.com/dashboard → โปรเจกต์ของเว็บ
+1. **Authentication → Sign In / Providers → Google** → เปิด → วาง Client ID และ Client secret → Save
+2. **Authentication → URL Configuration**
+   - Site URL: `https://kinyangkku.vercel.app`
+   - Redirect URLs: เพิ่ม `https://kinyangkku.vercel.app/**` (และ `http://localhost:5173/**` ถ้าทดสอบในเครื่อง)
+
+**3. รัน SQL** — SQL Editor → วางส่วน "ระบบสมาชิก" ท้าย `supabase/schema.sql` → Run (รันทั้งไฟล์ซ้ำก็ได้ ข้อมูลเดิมไม่หาย)
+
+**4. ตั้งผู้ดูแล** — ให้ผู้ดูแลเข้าสู่ระบบที่เว็บหนึ่งครั้งก่อน แล้วรันใน SQL Editor (เปลี่ยนอีเมล):
+```sql
+insert into public.admins (user_id)
+select id from auth.users where email = 'อีเมลผู้ดูแล@gmail.com';
+```
+เพิ่มผู้ดูแลหลายคนได้ด้วยการรันซ้ำ ถอดสิทธิ์: `delete from public.admins where user_id = (select id from auth.users where email = '...');`
+ผู้ดูแลจะเห็นเมนู "ตรวจรายงานรีวิว" เมื่อกดรูปบัญชีมุมขวาบน
+
+> การเข้าสู่ระบบใช้ไม่ได้เมื่อเปิด `index.html` ด้วยการดับเบิลคลิก (file://) ต้องเปิดผ่านเซิร์ฟเวอร์หรือเว็บจริง

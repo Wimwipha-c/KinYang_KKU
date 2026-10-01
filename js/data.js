@@ -92,6 +92,12 @@
     ["b", "งบหลักสิบ"], ["d", "ของหวาน"], ["s", "ซดน้ำ"], ["i", "อาหารอีสาน"]
   ];
 
+  // เหตุผลการรายงานรีวิว (ต้องตรงกับ check ของตาราง review_reports ใน supabase/schema.sql)
+  const REPORT_REASONS = [
+    ["rude", "คำหยาบหรือไม่สุภาพ"], ["closed", "ร้านปิดแล้ว"], ["wrong", "ข้อมูลไม่ถูกต้อง"],
+    ["spam", "สแปมหรือโฆษณา"], ["other", "อื่นๆ"]
+  ];
+
   // หาเมนูในเซียมซีที่ตรงกับชื่อที่ผู้ใช้พิมพ์ (ใช้เดาหมวดของรีวิว)
   function findMenu(text) {
     const t = String(text || "").trim();
@@ -99,5 +105,5 @@
     return MENUS.find(m => m.name === t || t.includes(m.name.split("/")[0].split("+")[0])) || null;
   }
 
-  KY.data = { CATEGORIES, MENUS, AREAS, LOCATIONS, LUCKY_COLORS, RATING_LABELS, FORTUNE_FILTERS, findMenu };
+  KY.data = { CATEGORIES, MENUS, AREAS, LOCATIONS, LUCKY_COLORS, RATING_LABELS, FORTUNE_FILTERS, REPORT_REASONS, findMenu };
 })(window.KY = window.KY || {});

@@ -50,6 +50,11 @@
     <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"/></symbol>
     <symbol id="i-volume-off" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="m16 9.5 5 5M21 9.5l-5 5"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.2a4.3 4.3 0 0 1 7.5 2.6C19.5 15.4 12 20 12 20z"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5.5 21V4"/><path d="M5.5 4.5h11.5l-2.2 4.25L17 13H5.5"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="m10 16-4-4 4-4M6 12h10"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3.5c2.5 0 3.5 1.5 5 5s2.5 5 5 5H20"/><path d="M4 17h3.5c1.3 0 2.2-.4 2.9-1.2M14.6 8.2c.7-.8 1.6-1.2 2.9-1.2H20"/><path d="m17 4 3 3-3 3M17 14l3 3-3 3"/></symbol>
     <!-- หมวดอาหาร -->
     <symbol id="i-noodle" viewBox="0 0 24 24"><path d="M3.5 11.5h17a8.5 8 0 0 1-17 0z"/><path d="M8.5 20.5h7"/><path d="m13.5 11.5 6-8M10.5 11.5 15.5 4"/></symbol>
     <symbol id="i-rice" viewBox="0 0 24 24"><path d="M3.5 12.5h17a8.5 7.5 0 0 1-17 0z"/><path d="M6.5 12.5a5.5 5 0 0 1 11 0"/><path d="M8.5 21h7"/></symbol>
@@ -70,13 +75,18 @@
         <a class="site-nav__link" href="#reviews">รีวิว</a>
         <button type="button" class="site-nav__link" data-act="fortune">เซียมซี</button>
       </nav>
+      <button type="button" class="icon-btn fav-open" data-act="favs" aria-label="ลิสต์ของฉัน">
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span class="count-badge" id="favCount" hidden></span>
+      </button>
       <button type="button" class="icon-btn theme-btn" id="themeBtn" data-act="theme" aria-label="สลับธีม">
         <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"/></svg>
         <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"/></svg>
       </button>
-      <button type="button" class="btn btn-primary btn-sm" data-act="review">
-        <svg class="icon" aria-hidden="true"><use href="#i-pen"/></svg><span>เขียนรีวิว</span>
+      <button type="button" class="btn btn-primary btn-sm header-review" data-act="review" aria-label="เขียนรีวิว">
+        <svg class="icon" aria-hidden="true"><use href="#i-pen"/></svg><span class="hide-sm">เขียนรีวิว</span>
       </button>
+      <!-- ปุ่มเข้าสู่ระบบ / รูปบัญชี: สร้างโดย js/account.js -->
+      <div class="account-slot" id="accountSlot" hidden></div>
     </div>
   </header>
 
@@ -109,6 +119,17 @@
           <p class="hero__hint" id="heroHint"></p>
         </div>
       </div>
+    </section>
+
+    <!-- เมนูยอดฮิตประจำสัปดาห์: สร้างโดย js/trending.js (ซ่อนไว้จนกว่าจะมีข้อมูล) -->
+    <section class="section section--trending container" id="trending" aria-labelledby="trendingTitle" hidden>
+      <div class="section__head">
+        <div>
+          <h2 class="section__title" id="trendingTitle">ช่วงนี้ชาว มข. ฮิตกินอะไร</h2>
+          <p class="section__meta">จัดอันดับจากรีวิวและผลเซียมซีใน 7 วันล่าสุด</p>
+        </div>
+      </div>
+      <ol class="trend-list" id="trendList"></ol>
     </section>
 
     <section class="section container" id="reviews" aria-labelledby="reviewsTitle">
@@ -145,7 +166,7 @@
   <footer class="site-footer">
     <div class="container site-footer__inner">
       <span class="logo__text logo__text--sm">กินหยัง<span class="logo__tag">KKU</span></span>
-      <p>© <span id="year"></span> · รีวิวร้านอาหารรอบ มข. โดยชาว มข. · คำทำนายมีไว้เพื่อความบันเทิง</p>
+      <p>© <span id="year"></span> · รีวิวร้านอาหารรอบ มข. โดยชาว มข. · คำทำนายมีไว้เพื่อความบันเทิง · <a href="privacy.html">นโยบายความเป็นส่วนตัว</a></p>
     </div>
   </footer>
 
@@ -159,6 +180,15 @@
   <div class="modal" id="reviewModal" role="dialog" aria-modal="true" aria-labelledby="reviewTitle">
     <div class="modal__panel" id="reviewBody"></div>
   </div>
+  <div class="modal" id="favModal" role="dialog" aria-modal="true" aria-labelledby="favTitle">
+    <div class="modal__panel" id="favBody"></div>
+  </div>
+  <div class="modal" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+    <div class="modal__panel" id="reportBody"></div>
+  </div>
+  <div class="modal" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
+    <div class="modal__panel" id="accountBody"></div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
@@ -168,8 +198,14 @@
   <script src="js/ui.js" defer></script>
   <script src="js/theme.js" defer></script>
   <script src="js/sound.js" defer></script>
+  <script src="js/db.js" defer></script>
+  <script src="js/auth.js" defer></script>
   <script src="js/reviews-store.js" defer></script>
   <script src="js/review-list.js" defer></script>
+  <script src="js/trending.js" defer></script>
+  <script src="js/favorites.js" defer></script>
+  <script src="js/report.js" defer></script>
+  <script src="js/account.js" defer></script>
   <script src="js/share-image.js" defer></script>
   <script src="js/fortune.js" defer></script>
   <script src="js/review-form.js" defer></script>

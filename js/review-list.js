@@ -70,7 +70,11 @@
       ${long ? `<button type="button" class="text-btn" data-act="more" aria-expanded="false">อ่านต่อ</button>` : ""}
       <div class="review-card__foot">
         <span class="review-card__by"><span class="avatar" aria-hidden="true">${esc((r.name || "ม").trim().charAt(0))}</span>${esc(r.name || "เพื่อน มข.")} · ${formatDate(r.createdAt)}${r._local ? ` · <span class="muted">ในเครื่องนี้</span>` : ""}</span>
-        ${hasPrice(r.price) ? `<span class="price">฿${esc(r.price)}</span>` : ""}
+        <span class="review-card__end">
+          ${hasPrice(r.price) ? `<span class="price">฿${esc(r.price)}</span>` : ""}
+          ${KY.favs.button("review", r.id, "icon-btn--sm")}
+          ${r._local ? "" : `<button type="button" class="icon-btn icon-btn--sm" data-act="report" data-v="${esc(r.id)}" aria-label="รายงานรีวิวนี้">${icon("flag")}</button>`}
+        </span>
       </div>
     </article>`;
   }
@@ -150,6 +154,12 @@
     render();
   }
   function setQuery(q) { view.q = q; render(); }
+  // ค้นหาจากภายนอก (เช่นกดเมนูยอดฮิต): ล้างตัวกรองอื่นแล้วใส่คำค้นในช่องค้นหา
+  function search(q) {
+    Object.assign(view, { loc: "all", area: "", q });
+    $("#q").value = q;
+    render();
+  }
   function setSort(s) { view.sort = s; render(); }
   function clear() {
     Object.assign(view, { loc: "all", area: "", q: "" });
@@ -157,5 +167,5 @@
     render();
   }
 
-  KY.list = { render, setLocation, setArea, setQuery, setSort, clear, categoryOf };
+  KY.list = { render, setLocation, setArea, setQuery, search, setSort, clear, categoryOf };
 })(window.KY = window.KY || {});

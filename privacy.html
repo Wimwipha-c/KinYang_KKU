@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>นโยบายความเป็นส่วนตัว — กินหยัง KKU</title>
+  <meta name="theme-color" content="#F6F1E9" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#15110E" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <script>
+    /* ใส่ธีมที่ผู้ใช้เลือกไว้ก่อนหน้าเว็บจะแสดง เพื่อไม่ให้จอกะพริบ */
+    try { var t = JSON.parse(localStorage.getItem("kky_theme")); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Noto+Serif+Thai:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .policy { max-width: 720px; }
+    .policy h2 { margin: 32px 0 10px; font-size: 22px; }
+    .policy p, .policy li { color: var(--ink-2); line-height: 1.8; }
+    .policy ul { padding-left: 1.3em; margin: 0; }
+    .policy__date { color: var(--ink-3); font-size: 14px; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container site-header__inner">
+      <a class="logo" href="./" aria-label="กินหยัง KKU กลับหน้าหลัก">
+        <span class="logo__text">กินหยัง<span class="logo__tag">KKU</span></span>
+      </a>
+      <a class="btn btn-secondary btn-sm" href="./">กลับหน้าหลัก</a>
+    </div>
+  </header>
+
+  <main class="section container policy">
+    <h1 class="section__title">นโยบายความเป็นส่วนตัว</h1>
+    <p class="policy__date">ปรับปรุงล่าสุด 1 ตุลาคม 2569</p>
+
+    <h2>ข้อมูลที่เราเก็บ</h2>
+    <ul>
+      <li><b>รีวิว</b> ที่คุณโพสต์ (ชื่อเมนู ร้าน พื้นที่ ราคา คะแนน ข้อความ และชื่อที่แสดง) จะแสดงต่อสาธารณะบนเว็บ</li>
+      <li><b>ผลเซียมซี</b> เก็บเฉพาะชื่อเมนูและเวลา ไม่มีข้อมูลระบุตัวตน ใช้จัดอันดับเมนูยอดฮิตประจำสัปดาห์</li>
+      <li><b>เมื่อเข้าสู่ระบบด้วย Google</b> เราได้รับชื่อ อีเมล และรูปโปรไฟล์จากบัญชี Google ของคุณ ใช้เพื่อแสดงบัญชีของคุณ เก็บลิสต์ของฉัน และป้องกันการรายงานรีวิวซ้ำ</li>
+      <li><b>ลิสต์ของฉัน</b> (เมนูและรีวิวที่บันทึกไว้) เห็นได้เฉพาะคุณ</li>
+      <li><b>รายงานรีวิว</b> เห็นได้เฉพาะคุณและผู้ดูแลเว็บ เจ้าของรีวิวและผู้ใช้คนอื่นไม่เห็นว่าใครรายงาน</li>
+    </ul>
+
+    <h2>ข้อมูลที่เก็บในเครื่องของคุณ</h2>
+    <p>เว็บใช้ localStorage ของเบราว์เซอร์เพื่อจำธีม ผลเซียมซีของวัน และลิสต์ของฉันกรณีที่ยังไม่เข้าสู่ระบบ ล้างได้ด้วยการลบข้อมูลเว็บไซต์ในเบราว์เซอร์</p>
+
+    <h2>การใช้และการเปิดเผยข้อมูล</h2>
+    <p>เราใช้ข้อมูลเพื่อให้บริการเว็บนี้เท่านั้น ไม่ขาย ไม่แชร์ให้บุคคลอื่น และไม่ใช้เพื่อโฆษณา ข้อมูลจัดเก็บที่ Supabase ซึ่งเป็นผู้ให้บริการฐานข้อมูลของเว็บ</p>
+
+    <h2>การลบข้อมูล</h2>
+    <p>ออกจากระบบได้ทุกเมื่อ หากต้องการให้ลบบัญชีและข้อมูลทั้งหมด หรือลบรีวิวของคุณ ติดต่อ <a class="text-btn" href="mailto:wimwipha.c@kkumail.com">wimwipha.c@kkumail.com</a></p>
+  </main>
+</body>
+</html>
