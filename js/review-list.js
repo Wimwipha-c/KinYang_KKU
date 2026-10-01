@@ -79,7 +79,7 @@
           ${hasPrice(r.price) ? `<span class="price">฿${esc(r.price)}</span>` : ""}
           ${KY.favs.button("review", r.id, "icon-btn--sm")}
           ${KY.profile.isMine(r)
-            ? `<button type="button" class="icon-btn icon-btn--sm" data-act="review-edit" data-v="${esc(r.id)}" aria-label="แก้ไขรีวิวของคุณ">${icon("pen")}</button>
+            ? `${r._local ? "" : `<button type="button" class="icon-btn icon-btn--sm" data-act="review-edit" data-v="${esc(r.id)}" aria-label="แก้ไขรีวิวของคุณ">${icon("pen")}</button>`}
                <button type="button" class="icon-btn icon-btn--sm" data-act="review-delete" data-v="${esc(r.id)}" aria-label="ลบรีวิวของคุณ">${icon("trash")}</button>`
             : r._local ? "" : `<button type="button" class="icon-btn icon-btn--sm" data-act="report" data-v="${esc(r.id)}" aria-label="รายงานรีวิวนี้">${icon("flag")}</button>`}
         </span>
