@@ -146,10 +146,15 @@
     st.busy.delete(reviewId); render();
   }
 
-  function remove(reviewId) {
+  async function remove(reviewId) {
     const g = groups("pending").find(x => x.review.id === reviewId);
-    const name = g ? `${g.review.menu} (${g.review.shop})` : "รีวิวนี้";
-    if (!confirm(`ลบ ${name} ถาวร?\nรีวิวจะหายจากเว็บของทุกคนทันที และกู้คืนไม่ได้`)) return;
+    const name = g ? `<b>${esc(g.review.menu)}</b> · ${esc(g.review.shop)}<br>` : "";
+    const ok = await KY.ui.confirm({
+      title: "ลบรีวิวนี้ถาวร?",
+      body: `${name}รีวิวจะหายจากเว็บของทุกคนทันที และกู้คืนไม่ได้`,
+      confirmText: "ลบรีวิว", danger: true
+    });
+    if (!ok) return;
     act(reviewId, async () => {
       const { data, error } = await db.from("reviews").delete().eq("id", reviewId).select("id");
       if (error) throw error;
