@@ -69,11 +69,19 @@
       <p class="review-card__text">${esc(r.text || "")}</p>
       ${long ? `<button type="button" class="text-btn" data-act="more" aria-expanded="false">อ่านต่อ</button>` : ""}
       <div class="review-card__foot">
-        <span class="review-card__by"><span class="avatar" aria-hidden="true">${esc((r.name || "ม").trim().charAt(0))}</span>${esc(r.name || "เพื่อน มข.")} · ${formatDate(r.createdAt)}${r._local ? ` · <span class="muted">ในเครื่องนี้</span>` : ""}</span>
+        <span class="review-card__by"><span class="avatar" aria-hidden="true">${esc((r.name || "ม").trim().charAt(0))}</span>
+          <span class="review-card__meta">
+            <span class="review-card__who">${esc(r.name || "เพื่อน มข.")}</span>
+            <span>${[esc(KY.profile.authorLabel(r)), formatDate(r.createdAt), r.updated_at ? "แก้ไขแล้ว" : "", r._local ? `<span class="muted">ในเครื่องนี้</span>` : ""].filter(Boolean).join(" · ")}</span>
+          </span>
+        </span>
         <span class="review-card__end">
           ${hasPrice(r.price) ? `<span class="price">฿${esc(r.price)}</span>` : ""}
           ${KY.favs.button("review", r.id, "icon-btn--sm")}
-          ${r._local ? "" : `<button type="button" class="icon-btn icon-btn--sm" data-act="report" data-v="${esc(r.id)}" aria-label="รายงานรีวิวนี้">${icon("flag")}</button>`}
+          ${KY.profile.isMine(r)
+            ? `<button type="button" class="icon-btn icon-btn--sm" data-act="review-edit" data-v="${esc(r.id)}" aria-label="แก้ไขรีวิวของคุณ">${icon("pen")}</button>
+               <button type="button" class="icon-btn icon-btn--sm" data-act="review-delete" data-v="${esc(r.id)}" aria-label="ลบรีวิวของคุณ">${icon("trash")}</button>`
+            : r._local ? "" : `<button type="button" class="icon-btn icon-btn--sm" data-act="report" data-v="${esc(r.id)}" aria-label="รายงานรีวิวนี้">${icon("flag")}</button>`}
         </span>
       </div>
     </article>`;

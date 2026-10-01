@@ -32,6 +32,11 @@
     "fav-pick":            () => KY.favs.pickOne(),
     "fav-show":            (el, v) => KY.favs.show(v),
     "report":              (el, v) => KY.report.open(v),
+    "profile":             () => { KY.account.close(); KY.reviewForm.close(); KY.profile.open(); },
+    "close-profile":       () => KY.profile.close(),
+    "my-reviews":          () => { KY.account.close(); KY.profile.openMine(); },
+    "review-edit":         (el, v) => KY.profile.edit(v),
+    "review-delete":       (el, v) => KY.profile.remove(v),
     "close-report":        () => KY.report.close(),
     "report-reason":       (el, v) => KY.report.setReason(v),
     "more": el => {
@@ -80,4 +85,6 @@
 
   list.render();
   reviews.init(() => { list.render(); trending.schedule(); });
+  // ปุ่มแก้/ลบบนการ์ดรีวิวขึ้นกับว่าใครเข้าสู่ระบบ และชื่อในโปรไฟล์
+  KY.profile.onChange(() => list.render());
 })(window.KY = window.KY || {});

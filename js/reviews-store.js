@@ -60,6 +60,7 @@
     channel = client
       .channel("reviews-feed")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: TABLE }, payload => upsertRemote(payload.new))
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: TABLE }, payload => upsertRemote(payload.new))
       .on("postgres_changes", { event: "DELETE", schema: "public", table: TABLE }, payload => {
         store.remote = store.remote.filter(r => r.id !== payload.old.id);
         onChange();
@@ -87,7 +88,8 @@
       const row = {
         menu: review.menu, shop: review.shop, loc: review.loc, area: review.area,
         price: review.price === "" ? null : review.price,
-        rating: review.rating, text: review.text, name: review.name, cat: review.cat
+        rating: review.rating, text: review.text, name: review.name, cat: review.cat,
+        faculty: review.faculty || null, year: review.year || null
       };
       const { data, error } = await client.from(TABLE).insert(row).select().single();
       if (error) throw error;
@@ -101,5 +103,38 @@
     return false;
   }
 
-  KY.reviews = { state: store, all, init, retry, add };
+  // แก้รีวิวของตัวเอง (ฐานข้อมูลยอมให้แก้เฉพาะเจ้าของ ถ้าไม่ใช่จะได้ผลลัพธ์ว่าง)
+  async function update(id, fields) {
+    const { data, error } = await client.from(TABLE)
+      .update({ ...fields, updated_at: new Date().toISOString() })
+      .eq("id", id).select();
+    if (error) throw error;
+    if (!data.length) throw new Error("not allowed");
+    upsertRemote(data[0]);
+  }
+
+  // แก้ชื่อ/คณะบนรีวิวทั้งหมดของผู้ใช้คนนี้ (หลังแก้โปรไฟล์)
+  async function updateAuthor(userId, fields) {
+    const { data, error } = await client.from(TABLE).update(fields).eq("user_id", userId).select();
+    if (error) throw error;
+    data.forEach(row => { store.remote = store.remote.map(r => (r.id === row.id ? fromRow(row) : r)); });
+    onChange();
+  }
+
+  async function remove(id) {
+    const { data, error } = await client.from(TABLE).delete().eq("id", id).select("id");
+    if (error) throw error;
+    if (!data.length) throw new Error("not allowed");
+    store.remote = store.remote.filter(r => r.id !== id);
+    onChange();
+  }
+
+  // รีวิวทั้งหมดของผู้ใช้ (ดึงจากฐานข้อมูล เพราะที่โหลดบนหน้าแรกมีแค่ 300 รีวิวล่าสุด)
+  async function byUser(userId) {
+    const { data, error } = await client.from(TABLE).select("*").eq("user_id", userId).order("created_at", { ascending: false });
+    if (error) throw error;
+    return data.map(fromRow);
+  }
+
+  KY.reviews = { state: store, all, init, retry, add, update, updateAuthor, remove, byUser };
 })(window.KY = window.KY || {});

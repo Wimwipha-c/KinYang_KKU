@@ -81,6 +81,15 @@
 
   const LOCATIONS = { in: "ในมอ", out: "นอกมอ" };
 
+  // คณะสำหรับโปรไฟล์ (ชื่อเดียวกับที่ใช้ในพื้นที่ "ในมอ")
+  const PROFILE_FACULTIES = FACULTIES.map(f => (f.startsWith("วิทยาลัย") ? f : "คณะ" + f));
+
+  // ชั้นปีในโปรไฟล์ (ต้องตรงกับ check ของตาราง profiles ใน supabase/schema.sql)
+  const YEARS = [
+    ["1", "ปี 1"], ["2", "ปี 2"], ["3", "ปี 3"], ["4", "ปี 4"], ["5", "ปี 5"], ["6", "ปี 6"],
+    ["grad", "ป.โท/เอก"], ["staff", "บุคลากร"], ["alumni", "ศิษย์เก่า"]
+  ];
+
   const LUCKY_COLORS = [
     ["แดงอิฐ", "#B3441F"], ["ทองข้าวเหนียว", "#D9A43A"], ["เขียวใบตอง", "#4F7A3A"],
     ["ม่วงผ้าขาวม้า", "#6B4A8A"], ["ฟ้าสายน้ำพอง", "#3A7CA5"], ["ชมพูกลีบบัว", "#D86A8B"]
@@ -105,5 +114,5 @@
     return MENUS.find(m => m.name === t || t.includes(m.name.split("/")[0].split("+")[0])) || null;
   }
 
-  KY.data = { CATEGORIES, MENUS, AREAS, LOCATIONS, LUCKY_COLORS, RATING_LABELS, FORTUNE_FILTERS, REPORT_REASONS, findMenu };
+  KY.data = { CATEGORIES, MENUS, AREAS, LOCATIONS, LUCKY_COLORS, RATING_LABELS, FORTUNE_FILTERS, REPORT_REASONS, PROFILE_FACULTIES, YEARS, findMenu };
 })(window.KY = window.KY || {});

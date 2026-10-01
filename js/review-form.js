@@ -6,11 +6,21 @@
   const { toast, openModal, closeModal } = KY.ui;
 
   const TEXT_MAX = 500;
-  const rf = { loc: "in", rating: 0, busy: false, draft: {} };
+  const rf = { loc: "in", rating: 0, busy: false, draft: {}, editId: null };
 
   function open(prefill = {}) {
+    rf.busy = false;
+    // แก้รีวิวเดิมของตัวเอง
+    if (prefill.edit) {
+      const r = prefill.edit;
+      rf.editId = r.id; rf.rating = Number(r.rating) || 0; rf.loc = r.loc === "out" ? "out" : "in";
+      rf.draft = { menu: r.menu || "", cat: r.cat || "", shop: r.shop || "", area: r.area || "", price: r.price === "" || r.price == null ? "" : String(r.price), text: r.text || "", name: "" };
+      render();
+      openModal("reviewModal", "#fMenu");
+      return;
+    }
     const savedArea = storage.get("kky_area", "");
-    rf.rating = 0; rf.busy = false;
+    rf.editId = null; rf.rating = 0;
     rf.loc = prefill.loc || KY.fortune.areaLoc(savedArea);
     rf.draft = {
       menu: prefill.menu || "", cat: prefill.cat || "", shop: "",
@@ -29,6 +39,16 @@
     </div>`;
   }
 
+  // ชื่อผู้รีวิว: ถ้าเข้าสู่ระบบแล้วใช้ชื่อจากโปรไฟล์ (แก้ได้ที่หน้าโปรไฟล์) ไม่เช่นนั้นให้พิมพ์เอง
+  function nameField(d) {
+    if (KY.auth && KY.auth.user) {
+      const label = KY.profile.authorLabel({ faculty: KY.profile.faculty(), year: KY.profile.year() });
+      return `<p class="byline-note">${icon("check")}<span>${rf.editId ? "รีวิวในชื่อ" : "โพสต์ในชื่อ"} <b>${esc(KY.profile.name())}</b>${label ? ` · ${esc(label)}` : ""}
+        <button type="button" class="text-btn" data-act="profile">แก้ไขโปรไฟล์</button></span></p>`;
+    }
+    return field("fName", "ชื่อที่แสดง <span class=\"muted\">(ไม่บังคับ)</span>", `<input id="fName" class="input" value="${esc(d.name)}" maxlength="30" placeholder="เพื่อน มข." autocomplete="nickname">`);
+  }
+
   function render() {
     const d = rf.draft;
     const areaOpts = AREAS[rf.loc].map(a => `<option value="${esc(a)}"${d.area === a ? " selected" : ""}>${esc(a)}</option>`).join("");
@@ -37,7 +57,7 @@
 
     $("#reviewBody").innerHTML = `
       <div class="modal__head">
-        <div><h2 class="modal__title" id="reviewTitle">เขียนรีวิว</h2><p class="modal__sub">แนะนำร้านโปรดให้เพื่อน มข. ได้ลองบ้าง</p></div>
+        <div><h2 class="modal__title" id="reviewTitle">${rf.editId ? "แก้ไขรีวิว" : "เขียนรีวิว"}</h2><p class="modal__sub">${rf.editId ? "แก้แล้วทุกคนจะเห็นรีวิวฉบับใหม่ทันที" : "แนะนำร้านโปรดให้เพื่อน มข. ได้ลองบ้าง"}</p></div>
         <button type="button" class="icon-btn" data-act="close-review" aria-label="ปิด">${icon("close")}</button>
       </div>
       <form class="modal__content form" id="reviewForm" novalidate>
@@ -65,10 +85,10 @@
         </div>
         ${field("fText", "รีวิว", `<textarea id="fText" class="input" maxlength="${TEXT_MAX}" rows="4" placeholder="รสชาติ ปริมาณ บรรยากาศ หรือเมนูที่อยากแนะนำ">${esc(d.text)}</textarea>`,
           `<p class="field__hint field__hint--end"><span id="textCount">${d.text.length}</span>/${TEXT_MAX}</p>`)}
-        ${field("fName", "ชื่อที่แสดง <span class=\"muted\">(ไม่บังคับ)</span>", `<input id="fName" class="input" value="${esc(d.name)}" maxlength="30" placeholder="เพื่อน มข." autocomplete="nickname">`)}
+        ${nameField(d)}
       </form>
       <div class="modal__foot">
-        <button type="submit" form="reviewForm" class="btn btn-primary btn-lg btn-block" id="submitBtn">โพสต์รีวิว</button>
+        <button type="submit" form="reviewForm" class="btn btn-primary btn-lg btn-block" id="submitBtn">${rf.editId ? "บันทึกการแก้ไข" : "โพสต์รีวิว"}</button>
         <p class="field__error field__error--center" id="submitError" role="alert"></p>
       </div>`;
 
@@ -126,18 +146,40 @@
     }
 
     const menuHit = findMenu(d.menu);
+    const signedIn = !!(KY.auth && KY.auth.user);
     const review = {
       menu: d.menu.trim(), shop: d.shop.trim(), loc: rf.loc, area: d.area,
       price: d.price === "" ? "" : Number(d.price), rating: rf.rating, text: d.text.trim(),
-      name: d.name.trim() || "เพื่อน มข.", cat: menuHit ? menuHit.cat : (d.cat || "other"),
+      name: signedIn ? KY.profile.name() : (d.name.trim() || "เพื่อน มข."),
+      faculty: signedIn ? KY.profile.faculty() : null, year: signedIn ? KY.profile.year() : null,
+      cat: menuHit ? menuHit.cat : (d.cat || "other"),
       createdAt: Date.now()
     };
-    storage.set("kky_name", d.name.trim());
+    if (!signedIn) storage.set("kky_name", d.name.trim());
 
     rf.busy = true;
     const btn = $("#submitBtn");
-    btn.disabled = true; btn.textContent = "กำลังโพสต์…";
+    btn.disabled = true; btn.textContent = rf.editId ? "กำลังบันทึก…" : "กำลังโพสต์…";
     $("#submitError").textContent = "";
+
+    if (rf.editId) {
+      try {
+        await KY.reviews.update(rf.editId, {
+          menu: review.menu, shop: review.shop, loc: review.loc, area: review.area,
+          price: review.price === "" ? null : review.price, rating: review.rating, text: review.text, cat: review.cat
+        });
+        rf.busy = false;
+        close();
+        KY.profile.reviewChanged();
+        toast("บันทึกการแก้ไขแล้ว");
+      } catch (e) {
+        console.error("edit review", e);
+        rf.busy = false; btn.disabled = false; btn.textContent = "ลองบันทึกอีกครั้ง";
+        $("#submitError").textContent = "บันทึกไม่สำเร็จ ข้อความที่แก้ยังอยู่ กรุณาลองใหม่";
+      }
+      return;
+    }
+
     try {
       const shared = await KY.reviews.add(review);
       rf.busy = false;
