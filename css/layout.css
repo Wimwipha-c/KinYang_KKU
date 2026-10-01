@@ -126,9 +126,21 @@
   margin-inline: auto;
   padding: 12px 0;
 }
+.hero__stack { position: relative; }
+.hero__slip { display: block; cursor: pointer; border-radius: var(--radius-xs); -webkit-tap-highlight-color: transparent; }
+.hero__slip .slip--hero { transition: transform .3s var(--ease), box-shadow .3s; }
+.hero__slip:hover .slip--hero { transform: rotate(1deg) translateY(-6px); box-shadow: var(--shadow-3); }
+.hero__slip:active .slip--hero { transform: rotate(1.5deg) scale(.98); }
+.hero__slip:focus-visible { outline-offset: 8px; }
+.hero__hint {
+  margin-top: 22px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
 .hero__slip-back {
   position: absolute;
-  inset: 12px 0;
+  inset: 0;
   border-radius: var(--radius-xs);
   background: var(--paper-2);
   border: 1px solid var(--line-strong);

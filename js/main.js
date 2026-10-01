@@ -41,6 +41,14 @@
     if (fn) fn(el, el.dataset.v);
   });
 
+  // องค์ประกอบที่ทำตัวเป็นปุ่ม (role="button") ต้องกดด้วย Enter/Space ได้
+  document.addEventListener("keydown", e => {
+    if ((e.key === "Enter" || e.key === " ") && e.target.matches('[role="button"][data-act]')) {
+      e.preventDefault();
+      e.target.click();
+    }
+  });
+
   $("#q").addEventListener("input", e => list.setQuery(e.target.value));
   $("#areaSel").addEventListener("change", e => list.setArea(e.target.value));
   $("#sortSel").addEventListener("change", e => list.setSort(e.target.value));

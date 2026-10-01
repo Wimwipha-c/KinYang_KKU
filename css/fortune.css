@@ -63,6 +63,7 @@
   font-weight: 700;
   line-height: 1.35;
   color: var(--ink);
+  text-wrap: balance;
 }
 .slip__verse {
   max-width: 22em;
@@ -76,7 +77,8 @@
 
 .slip__facts {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  /* ช่องสีมงคลกว้างกว่า เพราะชื่อสียาว เช่น "ทองข้าวเหนียว" */
+  grid-template-columns: 1.45fr 1fr 1fr;
   border-top: 1px dashed var(--line-strong);
   background: var(--surface);
 }
@@ -89,6 +91,7 @@
   justify-content: center;
   gap: 6px;
   min-height: 24px;
+  white-space: nowrap;
   font-size: 14px;
   font-weight: 600;
   color: var(--ink);

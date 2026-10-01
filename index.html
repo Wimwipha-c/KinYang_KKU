@@ -100,24 +100,13 @@
           </dl>
         </div>
 
-        <div class="hero__art" aria-hidden="true">
-          <div class="hero__slip-back"></div>
-          <div class="slip slip--hero">
-            <div class="slip__inner">
-              <div class="slip__head"><span>เซียมซีกินหยัง</span><span>ใบที่ ๒๗</span></div>
-              <div class="slip__body">
-                <span class="slip__kicker">อาหารอีสาน</span>
-                <span class="cat-badge cat-badge--lg cat-isan"><svg class="icon"><use href="#i-isan"/></svg></span>
-                <p class="slip__menu">ส้มตำปูปลาร้า</p>
-                <p class="slip__verse">ตัดสินใจไม่ได้ ก็ตำปูปลาร้าเลย</p>
-              </div>
-              <dl class="slip__facts">
-                <div><dt>สีมงคล</dt><dd><i class="swatch" style="background:#D9A43A"></i>ทองข้าวเหนียว</dd></div>
-                <div><dt>เลขนำโชค</dt><dd>27</dd></div>
-                <div><dt>ความเผ็ด</dt><dd><span class="spice"><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i class="is-on"></i><i></i></span></dd></div>
-              </dl>
-            </div>
+        <!-- ใบเซียมซีหน้าแรก: สร้างโดย js/fortune.js (สุ่มตัวอย่าง หรือดวงของผู้ใช้วันนี้) -->
+        <div class="hero__art">
+          <div class="hero__stack">
+            <div class="hero__slip-back" aria-hidden="true"></div>
+            <div class="hero__slip" id="heroSlip" role="button" tabindex="0" data-act="fortune" aria-label="เสี่ยงเซียมซี"></div>
           </div>
+          <p class="hero__hint" id="heroHint"></p>
         </div>
       </div>
     </section>

@@ -44,16 +44,17 @@
     const fresh = $("#soundBtn"); if (fresh) fresh.focus();
   }
 
-  function slipHtml(c) {
+  // badge: ข้อความป้ายด้านบน (ถ้าไม่ใส่จะแสดงชื่อหมวดอาหาร), cls: class เพิ่มของใบ
+  function slipHtml(c, { badge = "", cls = "" } = {}) {
     const m = c.menu, cat = CATEGORIES[m.cat];
     const spice = Array.from({ length: 5 }, (_, i) => `<i class="${i < m.spice ? "is-on" : ""}"></i>`).join("");
-    return `<div class="slip">
+    return `<div class="slip ${cls}">
       <div class="slip__inner">
         <div class="slip__head"><span>เซียมซีกินหยัง</span><span>ใบที่ ${thaiDigits(c.number)}</span></div>
         <div class="slip__body">
-          ${fs.dailyBadge ? `<span class="slip__badge">ดวงกินประจำวัน</span>` : `<span class="slip__kicker">${esc(cat.label)}</span>`}
+          ${badge ? `<span class="slip__badge">${badge}</span>` : `<span class="slip__kicker">${esc(cat.label)}</span>`}
           <span class="cat-badge cat-badge--lg cat-${m.cat}">${icon(cat.icon)}</span>
-          <p class="slip__menu">${esc(m.name)}</p>
+          <p class="slip__menu">${esc(m.name).replace(/([+/])/g, "$1<wbr>")}</p>
           <p class="slip__verse">${esc(c.line)}</p>
         </div>
         <dl class="slip__facts">
@@ -109,7 +110,7 @@
     const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${m.name} ใกล้ ${near}`);
     body.innerHTML = header("ผลเสี่ยงเซียมซี", "") + `
       <div class="modal__content">
-        ${slipHtml(fs.current)}
+        ${slipHtml(fs.current, { badge: fs.dailyBadge ? "ดวงกินประจำวัน" : "" })}
         <p class="callout">${icon("pin")}<span>${isGenericArea(a) ? "ลองหาร้านแถวมหาวิทยาลัย" : `ลองหาร้านใกล้ <b>${esc(a)}</b>`} แล้วกลับมาเขียนรีวิวให้เพื่อนๆ ด้วย</span></p>
       </div>
       <div class="modal__foot">
@@ -126,6 +127,7 @@
   function open() {
     fs.step = fs.current ? "result" : "pick";
     render();
+    if (fs.step === "result") prepareImage();
     openModal("fortuneModal", fs.step === "pick" ? "#fortuneArea" : ".modal__foot .btn");
   }
   const close = () => closeModal("fortuneModal");
@@ -163,7 +165,9 @@
       fs.dailyBadge = storage.get("kky_day", "") !== today;
       if (fs.dailyBadge) storage.set("kky_day", today);
 
-      fs.current = { menu, line: pick(menu.lines), color: pick(LUCKY_COLORS), number: 1 + Math.floor(Math.random() * 99) };
+      fs.current = randomFortune(menu);
+      saveToday();
+      renderHero();
       fs.step = "result"; render();
       KY.sound.chime();
       prepareImage();
@@ -174,6 +178,46 @@
       fs.step = "pick"; render(); toast("สุ่มไม่สำเร็จ กรุณาลองใหม่");
     }
   }
+
+  /* ---------- ดวงของวันนี้ และใบเซียมซีหน้าแรก ---------- */
+  const TODAY_KEY = "kky_today";
+  const todayStr = () => new Date().toDateString();
+  let heroSample = null;
+
+  function randomFortune(menu = pick(MENUS)) {
+    return { menu, line: pick(menu.lines), color: pick(LUCKY_COLORS), number: 1 + Math.floor(Math.random() * 99) };
+  }
+
+  function saveToday() {
+    const c = fs.current;
+    storage.set(TODAY_KEY, { date: todayStr(), name: c.menu.name, line: c.line, color: c.color, number: c.number, daily: fs.dailyBadge });
+  }
+
+  // ถ้าวันนี้เคยเสี่ยงแล้ว ให้คืนผลล่าสุดของวันนี้กลับมา (ข้ามวันแล้วจะเริ่มใหม่)
+  function restoreToday() {
+    const t = storage.get(TODAY_KEY, null);
+    if (!t || t.date !== todayStr()) return;
+    const menu = MENUS.find(m => m.name === t.name);
+    if (!menu) return;
+    fs.current = { menu, line: t.line, color: t.color, number: t.number };
+    fs.dailyBadge = !!t.daily;
+  }
+
+  // หน้าแรก: แสดงดวงของผู้ใช้ถ้าวันนี้เสี่ยงแล้ว ไม่เช่นนั้นสุ่มตัวอย่างใหม่ทุกครั้งที่เปิดเว็บ
+  function renderHero() {
+    const box = $("#heroSlip");
+    if (!box) return;
+    const mine = !!fs.current;
+    const c = fs.current || heroSample || (heroSample = randomFortune());
+    box.innerHTML = slipHtml(c, { badge: mine ? "ดวงกินวันนี้ของคุณ" : "", cls: "slip--hero" });
+    box.setAttribute("aria-label", mine
+      ? `ดวงกินวันนี้ของคุณ: ${c.menu.name} แตะเพื่อดูคำทำนาย`
+      : "ตัวอย่างใบเซียมซี แตะเพื่อเสี่ยงเซียมซีของคุณ");
+    $("#heroHint").textContent = mine ? "แตะเพื่อดูคำทำนายของคุณอีกครั้ง" : "แตะใบเซียมซีเพื่อเสี่ยงดวงกินของคุณ";
+  }
+
+  restoreToday();
+  renderHero();
 
   /* ---------- แชร์เป็นรูป ---------- */
   // สร้างรูปไว้ล่วงหน้าตั้งแต่ผลออก เพราะ iOS ต้องเปิดเมนูแชร์ทันทีที่ผู้ใช้กด ถ้ารอสร้างรูปตอนกดจะถูกบล็อก
