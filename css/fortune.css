@@ -160,8 +160,8 @@
   letter-spacing: .1em;
   opacity: .9;
 }
-.shaker__tube.is-shaking { animation: shake .42s ease-in-out infinite; }
-.shaker:has(.is-shaking) .shaker__sticks { animation: shake .42s ease-in-out infinite; }
+/* ใส่ class ให้ทั้งกระบอกและไม้ (ไม่ใช้ :has() เพราะ Safari บน iPad รุ่นเก่ายังไม่รองรับ) */
+.shaker__tube.is-shaking, .shaker__sticks.is-shaking { animation: shake .42s ease-in-out infinite; }
 
 .shaker__drop {
   position: absolute;
@@ -184,4 +184,25 @@
   0% { opacity: 1; transform: translateY(0); }
   45% { opacity: 1; transform: translateY(-40px) rotate(-10deg); }
   100% { opacity: 0; transform: translateY(-70px) translateX(30px) rotate(30deg); }
+}
+
+/* อุปกรณ์ที่เปิด "ลดการเคลื่อนไหว" (เช่น iPad ที่ตั้งค่า Reduce Motion) ยังเห็นการเขย่า แต่เบาและช้าลง
+   ต้องใช้ !important เพื่อชนะกฎใน base.css ที่ปิดแอนิเมชันทั้งเว็บไว้ */
+@media (prefers-reduced-motion: reduce) {
+  .shaker__tube.is-shaking, .shaker__sticks.is-shaking {
+    animation: shake-soft .9s ease-in-out infinite !important;
+  }
+  .shaker__drop.is-dropping {
+    animation: drop-soft .45s ease-out forwards !important;
+  }
+}
+@keyframes shake-soft {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+}
+@keyframes drop-soft {
+  0% { opacity: 0; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-24px); }
+  100% { opacity: 0; transform: translateY(-24px); }
 }
