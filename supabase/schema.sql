@@ -98,3 +98,102 @@ $$;
 
 revoke all on function public.weekly_trending(integer) from public;
 grant execute on function public.weekly_trending(integer) to anon, authenticated;
+
+
+-- ===================================================================
+-- ระบบสมาชิก (เข้าสู่ระบบด้วย Google): เมนูโปรด รายงานรีวิว และผู้ดูแล
+-- ต้องเปิด Google ใน Authentication ก่อน (ดูขั้นตอนใน README)
+-- รันซ้ำได้ ไม่ทำให้ข้อมูลเดิมหาย
+-- ===================================================================
+
+-- ผู้ดูแล: ไม่มี policy จึงอ่านหรือแก้จากหน้าเว็บไม่ได้ เพิ่มผู้ดูแลได้ทาง SQL Editor เท่านั้น
+--   insert into public.admins (user_id) select id from auth.users where email = 'อีเมลผู้ดูแล@gmail.com';
+create table if not exists public.admins (
+  user_id     uuid primary key references auth.users (id) on delete cascade,
+  created_at  timestamptz not null default now()
+);
+alter table public.admins enable row level security;
+
+create or replace function public.is_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select exists (select 1 from public.admins where user_id = auth.uid());
+$$;
+
+revoke all on function public.is_admin() from public;
+grant execute on function public.is_admin() to anon, authenticated;
+
+-- ผู้ดูแลลบรีวิวได้จากหน้า admin (ผู้ใช้ทั่วไปยังลบไม่ได้เหมือนเดิม)
+grant delete on public.reviews to authenticated;
+drop policy if exists "Admins can delete reviews" on public.reviews;
+create policy "Admins can delete reviews"
+  on public.reviews for delete
+  to authenticated
+  using (public.is_admin());
+
+-- เมนูโปรด: เห็นและแก้ได้เฉพาะเจ้าของบัญชี
+-- kind = 'menu' (ref = ชื่อเมนู) หรือ 'review' (ref = id รีวิว), data = ข้อมูลไว้แสดงในลิสต์
+create table if not exists public.favorites (
+  user_id     uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  kind        text not null check (kind in ('menu', 'review')),
+  ref         text not null check (char_length(ref) between 1 and 80),
+  data        jsonb not null default '{}'::jsonb check (pg_column_size(data) <= 2000),
+  created_at  timestamptz not null default now(),
+  primary key (user_id, kind, ref)
+);
+alter table public.favorites enable row level security;
+grant select, insert, update, delete on public.favorites to authenticated;
+
+drop policy if exists "Users manage own favorites" on public.favorites;
+create policy "Users manage own favorites"
+  on public.favorites for all
+  to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid());
+
+-- รายงานรีวิว: ต้องเข้าสู่ระบบ รายงานรีวิวเดียวกันได้คนละครั้ง
+-- ผู้รายงานเห็นเฉพาะรายงานของตัวเอง ผู้ดูแลเห็นและเปลี่ยนสถานะได้ทั้งหมด
+create table if not exists public.review_reports (
+  id           uuid primary key default gen_random_uuid(),
+  review_id    uuid not null references public.reviews (id) on delete cascade,
+  reporter     uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  reason       text not null check (reason in ('rude', 'closed', 'wrong', 'spam', 'other')),
+  detail       text not null default '' check (char_length(detail) <= 300),
+  status       text not null default 'pending' check (status in ('pending', 'resolved')),
+  created_at   timestamptz not null default now(),
+  resolved_at  timestamptz,
+  unique (review_id, reporter),
+  check (reason <> 'other' or char_length(btrim(detail)) > 0)
+);
+create index if not exists review_reports_status_idx on public.review_reports (status, created_at desc);
+alter table public.review_reports enable row level security;
+grant select, insert, update, delete on public.review_reports to authenticated;
+
+drop policy if exists "Signed-in users can report" on public.review_reports;
+create policy "Signed-in users can report"
+  on public.review_reports for insert
+  to authenticated
+  with check (reporter = auth.uid() and status = 'pending' and resolved_at is null);
+
+drop policy if exists "Reporters and admins can read reports" on public.review_reports;
+create policy "Reporters and admins can read reports"
+  on public.review_reports for select
+  to authenticated
+  using (reporter = auth.uid() or public.is_admin());
+
+drop policy if exists "Admins can update reports" on public.review_reports;
+create policy "Admins can update reports"
+  on public.review_reports for update
+  to authenticated
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "Admins can delete reports" on public.review_reports;
+create policy "Admins can delete reports"
+  on public.review_reports for delete
+  to authenticated
+  using (public.is_admin());

@@ -25,9 +25,9 @@
     return `<select id="${id}" class="input"><option value="">ไม่ระบุ</option>${group("in")}${group("out")}</select>`;
   }
 
-  const header = (title, sub) => `<div class="modal__head">
+  const header = (title, sub, extra = "") => `<div class="modal__head">
       <div><h2 class="modal__title" id="fortuneTitle">${title}</h2>${sub ? `<p class="modal__sub">${sub}</p>` : ""}</div>
-      <div class="modal__actions">${soundButton()}
+      <div class="modal__actions">${extra}${soundButton()}
         <button type="button" class="icon-btn" data-act="close-fortune" aria-label="ปิด">${icon("close")}</button>
       </div>
     </div>`;
@@ -108,7 +108,7 @@
     const a = areaName(fs.area);
     const near = isGenericArea(a) ? "มหาวิทยาลัยขอนแก่น" : `${a} มหาวิทยาลัยขอนแก่น`;
     const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(`${m.name} ใกล้ ${near}`);
-    body.innerHTML = header("ผลเสี่ยงเซียมซี", "") + `
+    body.innerHTML = header("ผลเสี่ยงเซียมซี", "", KY.favs.button("menu", m.name)) + `
       <div class="modal__content">
         ${slipHtml(fs.current, { badge: fs.dailyBadge ? "ดวงกินประจำวัน" : "" })}
         <p class="callout">${icon("pin")}<span>${isGenericArea(a) ? "ลองหาร้านแถวมหาวิทยาลัย" : `ลองหาร้านใกล้ <b>${esc(a)}</b>`} แล้วกลับมาเขียนรีวิวให้เพื่อนๆ ด้วย</span></p>

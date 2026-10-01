@@ -16,6 +16,8 @@
   gap: 16px;
   height: var(--header-h);
 }
+@media (max-width: 479px) { .site-header__inner { gap: 6px; } }
+.account-slot { display: flex; flex: none; }
 
 .logo { display: inline-flex; align-items: center; gap: 10px; margin-right: auto; }
 .logo__mark {

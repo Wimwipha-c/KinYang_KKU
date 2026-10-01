@@ -57,6 +57,55 @@
   :root:not([data-theme="light"]) .theme-btn .icon-moon { display: none; }
 }
 
+/* ปุ่มไอคอนขนาดเล็ก (บนการ์ดรีวิว) */
+.icon-btn--sm { width: 34px; height: 34px; }
+.icon-btn--sm .icon { width: 18px; height: 18px; }
+
+/* ปุ่มหัวใจ: กดแล้วเป็นหัวใจทึบสีแบรนด์ */
+.fav-btn[aria-pressed="true"] { color: var(--brand); }
+.fav-btn[aria-pressed="true"] .icon { fill: currentColor; }
+@media (prefers-reduced-motion: no-preference) {
+  .fav-btn[aria-pressed="true"] .icon { animation: pop .25s var(--ease); }
+}
+@keyframes pop { 50% { transform: scale(1.25); } }
+
+/* ปุ่มเข้าสู่ระบบด้วย Google */
+.g-logo { width: 18px; height: 18px; flex: none; }
+
+/* ตัวเลขบนปุ่มลิสต์ของฉัน */
+.fav-open { position: relative; }
+.count-badge {
+  position: absolute;
+  top: 2px; right: 0;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* รูปบัญชี */
+.avatar-btn { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; }
+.avatar-btn:hover .user-avatar { box-shadow: 0 0 0 3px var(--paper-2); }
+.user-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px; height: 34px;
+  flex: none;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--brand-tint);
+  color: var(--brand);
+  font-weight: 600;
+  font-size: 15px;
+}
+.user-avatar--lg { width: 48px; height: 48px; font-size: 20px; }
+
 .text-btn {
   align-self: flex-start;
   color: var(--brand);
@@ -173,10 +222,14 @@ select.input, .select {
 .toggle[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
 .toggle[aria-pressed="true"] .toggle__check { width: 16px; margin-right: 0; opacity: 1; }
 
+.toggle[aria-checked="true"] { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+.toggle[aria-checked="true"] .toggle__check { width: 16px; margin-right: 0; opacity: 1; }
+
 /* Star rating */
 .stars { display: inline-flex; gap: 1px; color: var(--line-strong); }
 .stars .icon { width: 14px; height: 14px; fill: currentColor; stroke: none; }
 .stars .icon.is-on { color: var(--gold); }
+.stars--sm .icon { width: 12px; height: 12px; }
 
 .rating-input { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 .star-input { display: flex; gap: 4px; }
@@ -262,6 +315,8 @@ select.input, .select {
 }
 .review-card__text { margin-bottom: 14px; }
 .review-card .text-btn { margin: -10px 0 14px; }
+.review-card__end { display: flex; align-items: center; gap: 2px; flex: none; margin-right: -8px; }
+.review-card__end .price { margin-right: 4px; }
 .review-card__by { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; color: var(--ink-3); }
 .avatar {
   display: grid;
@@ -318,6 +373,8 @@ select.input, .select {
 .empty-state h3 { font-size: 21px; margin-bottom: 6px; }
 .empty-state p { max-width: 30em; color: var(--ink-2); margin-bottom: 24px; }
 .empty-state__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.empty-state--sm { padding: 40px 20px; }
+.empty-state--sm p { margin-bottom: 0; }
 
 .notice, .callout {
   display: flex;
@@ -335,6 +392,9 @@ select.input, .select {
 .callout b { color: var(--ink); }
 
 .fineprint { margin-top: 12px; text-align: center; font-size: 13px; color: var(--ink-3); }
+.fineprint--start { margin: -4px 0 16px; text-align: left; line-height: 1.6; }
+.notice .text-btn, .callout .text-btn { display: inline; padding: 0; font-size: inherit; }
+.modal__content > .notice, .modal__content > .callout { margin: 0 0 20px; }
 
 /* ---------- Modal ---------- */
 .modal {
@@ -435,3 +495,58 @@ select.input, .select {
   transition: opacity .2s, transform .2s var(--ease);
 }
 .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- บัญชี ---------- */
+.account-head { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.account-head > div { min-width: 0; }
+.account-head .modal__sub { overflow-wrap: anywhere; }
+.menu-list { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  font-weight: 500;
+  text-align: left;
+  transition: border-color .15s, background-color .15s;
+}
+.menu-item:hover { border-color: var(--line-strong); background: var(--paper-2); }
+.menu-item > .icon:first-child { color: var(--brand); }
+.menu-item span { flex: 1; }
+.menu-item__end { color: var(--ink-3); width: 18px; height: 18px; }
+
+/* ---------- ลิสต์ของฉัน ---------- */
+.fav-group { margin: 4px 0 8px; font-family: var(--font-body); font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.fav-list { list-style: none; margin: 0 0 20px; padding: 0; border-top: 1px solid var(--line); }
+.fav-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.fav-row__body { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.4; }
+.fav-row__title { font-weight: 600; overflow-wrap: anywhere; }
+.fav-row__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; font-size: 13px; color: var(--ink-3); }
+.fav-row__actions { display: flex; align-items: center; flex: none; margin-right: -8px; }
+.fav-row__actions .btn { padding: 0 10px; }
+@media (max-width: 419px) { .fav-row__actions .btn span, .fav-row__actions .btn { font-size: 13px; } }
+
+.fav-pick {
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius-md);
+  background: var(--brand-tint);
+}
+.fav-pick__label { font-size: 13px; font-weight: 600; color: var(--brand); }
+.fav-pick__main { display: flex; align-items: center; gap: 14px; margin-top: 8px; }
+.fav-pick__title { font-family: var(--font-display); font-size: 24px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
+.fav-pick__action { margin-top: 12px; }
+.fav-pick__action .btn { background: var(--surface); }
+@media (prefers-reduced-motion: no-preference) { .fav-pick { animation: rise .3s var(--ease); } }
+
+/* ---------- ขนาดจอเล็ก: ย่อปุ่มบน header เหลือแต่ไอคอน ---------- */
+@media (max-width: 479px) {
+  .hide-sm { display: none; }
+  .header-review, .account-slot .google-btn { width: 40px; padding: 0; }
+}

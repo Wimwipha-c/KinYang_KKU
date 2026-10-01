@@ -29,7 +29,7 @@
   }
 
   async function refresh() {
-    const db = KY.reviews.db();
+    const db = KY.db.client;
     const mine = ++seq;   // ถ้ามีการโหลดใหม่ซ้อนเข้ามา ให้ใช้ผลของครั้งล่าสุดเท่านั้น
     let next = [];
     if (db) {
@@ -76,7 +76,7 @@
   }
 
   async function recordDraw(menu) {
-    const db = KY.reviews.db();
+    const db = KY.db.client;
     if (!db) return;
     try {
       const { error } = await db.from("fortune_draws").insert({ menu });

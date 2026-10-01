@@ -69,22 +69,11 @@
 
   async function init(changeHandler) {
     onChange = changeHandler || onChange;
-    const cfg = window.KY_CONFIG || {};
-    if (!cfg.supabaseUrl || !cfg.supabaseAnonKey || !window.supabase) {
-      if (cfg.supabaseUrl) console.warn("Supabase library not loaded; using local storage");
-      return;
-    }
-    try {
-      client = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-        auth: { persistSession: false }
-      });
-      store.shared = true;
-      await load();
-      listen();
-    } catch (e) {
-      console.error("supabase init", e);
-      store.status = "error"; onChange();
-    }
+    client = KY.db.client;
+    if (!client) return;
+    store.shared = true;
+    await load();
+    listen();
   }
 
   function retry() {
@@ -112,8 +101,5 @@
     return false;
   }
 
-  // ตัวเชื่อม Supabase สำหรับส่วนอื่นที่ใช้ฐานข้อมูลเดียวกัน (null ถ้าไม่ได้เชื่อม)
-  const db = () => client;
-
-  KY.reviews = { state: store, all, init, retry, add, db };
+  KY.reviews = { state: store, all, init, retry, add };
 })(window.KY = window.KY || {});

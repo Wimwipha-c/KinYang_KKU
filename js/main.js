@@ -22,6 +22,18 @@
     "clear":               () => list.clear(),
     "retry":               () => reviews.retry(),
     "trend": (el, v) => { list.search(v); $("#reviews").scrollIntoView(); },
+    "sign-in":             () => KY.auth.signIn(),
+    "sign-out":            () => KY.account.signOut(),
+    "account":             () => KY.account.open(),
+    "close-account":       () => KY.account.close(),
+    "favs":                () => { KY.account.close(); KY.favs.open(); },
+    "close-favs":          () => KY.favs.close(),
+    "fav":                 el => KY.favs.toggle(el.dataset.favKind, el.dataset.favRef),
+    "fav-pick":            () => KY.favs.pickOne(),
+    "fav-show":            (el, v) => KY.favs.show(v),
+    "report":              (el, v) => KY.report.open(v),
+    "close-report":        () => KY.report.close(),
+    "report-reason":       (el, v) => KY.report.setReason(v),
     "more": el => {
       const text = el.previousElementSibling;
       const open = text.classList.toggle("is-open");
@@ -33,7 +45,7 @@
   document.addEventListener("click", e => {
     // คลิกพื้นหลังเพื่อปิด modal
     if (e.target.classList && e.target.classList.contains("modal")) {
-      e.target.id === "fortuneModal" ? fortune.close() : reviewForm.close();
+      KY.ui.closeModal(e.target.id);
       return;
     }
     const el = e.target.closest("[data-act]");
