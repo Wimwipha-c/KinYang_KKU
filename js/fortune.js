@@ -166,6 +166,7 @@
       fs.current = { menu, line: pick(menu.lines), color: pick(LUCKY_COLORS), number: 1 + Math.floor(Math.random() * 99) };
       fs.step = "result"; render();
       KY.sound.chime();
+      prepareImage();
       const body = $("#fortuneBody"); body.scrollTop = 0;
       const first = body.querySelector(".modal__foot .btn"); if (first) first.focus({ preventScroll: true });
     } catch (e) {
@@ -174,12 +175,48 @@
     }
   }
 
+  /* ---------- แชร์เป็นรูป ---------- */
+  // สร้างรูปไว้ล่วงหน้าตั้งแต่ผลออก เพราะ iOS ต้องเปิดเมนูแชร์ทันทีที่ผู้ใช้กด ถ้ารอสร้างรูปตอนกดจะถูกบล็อก
+  let image = { for: null, file: null, promise: null };
+
+  function prepareImage() {
+    const c = fs.current;
+    if (!c || !KY.shareImage || image.for === c) return image.promise;
+    const target = { for: c, file: null, promise: null };
+    target.promise = KY.shareImage.render(c, { daily: fs.dailyBadge })
+      .then(blob => (target.file = new File([blob], `kinyang-fortune-${c.number}.png`, { type: "image/png" })))
+      .catch(e => { console.error("share image", e); return null; });
+    image = target;
+    return target.promise;
+  }
+
+  function download(file) {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url; a.download = file.name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+  }
+
   async function share() {
     const c = fs.current; if (!c) return;
-    const text = `ดวงกินวันนี้ของฉัน: ${c.menu.name}\n“${c.line}”\nสีมงคล ${c.color[0]} · เลขนำโชค ${c.number}\n— กินหยัง KKU`;
-    try {
-      if (navigator.share) { await navigator.share({ text }); return; }
-    } catch (e) { if (e && e.name === "AbortError") return; }
+    const host = location.host && !/^(localhost|127\.)/.test(location.host) ? location.host : (window.KY_CONFIG || {}).siteHost;
+    const text = `ดวงกินวันนี้ของฉัน: ${c.menu.name}\n“${c.line}”\n— กินหยัง KKU${host ? " " + host : ""}`;
+
+    let file = image.for === c ? image.file : null;
+    if (!file) {
+      const btn = $('[data-act="fortune-share"]');
+      if (btn) btn.disabled = true;
+      file = await prepareImage();
+      if (btn) btn.disabled = false;
+    }
+
+    if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], text }); return; }
+      catch (e) { if (e && e.name === "AbortError") return; /* แชร์ไม่ได้ ให้บันทึกรูปแทน */ }
+    }
+    if (file) { download(file); toast("บันทึกรูปดวงกินแล้ว"); return; }
+
     try { await navigator.clipboard.writeText(text); toast("คัดลอกคำทำนายแล้ว"); }
     catch (e) { toast("ไม่สามารถแชร์ได้ในขณะนี้"); }
   }

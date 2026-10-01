@@ -34,6 +34,7 @@ js/
   sound.js            เสียงเขย่าเซียมซี สังเคราะห์ด้วย Web Audio API ไม่ใช้ไฟล์เสียง
   reviews-store.js    การอ่าน/บันทึกรีวิว
   review-list.js      แสดงรายการรีวิวและตัวกรอง
+  share-image.js      วาดรูปใบเซียมซี (PNG 1080×1350) สำหรับแชร์
   fortune.js          เซียมซี
   review-form.js      ฟอร์มเขียนรีวิว
   main.js             ผูก event และเริ่มแอป
