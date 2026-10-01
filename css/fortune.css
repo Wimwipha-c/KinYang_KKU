@@ -1,0 +1,184 @@
+/* ใบเซียมซี และแอนิเมชันกระบอกเซียมซี */
+
+/* ---------- ใบเซียมซี ---------- */
+.slip {
+  position: relative;
+  padding: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+.slip--hero { transform: rotate(2.5deg); }
+
+.slip__inner {
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid var(--brand);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.slip__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 14px;
+  background: var(--brand);
+  color: var(--brand-ink);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.slip__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 20px 24px;
+  text-align: center;
+  background-image: radial-gradient(var(--line) 1px, transparent 1.2px);
+  background-size: 16px 16px;
+  background-position: center;
+}
+.slip__kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  color: var(--ink-3);
+}
+.slip__badge {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--gold-tint);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+}
+.slip__menu {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.slip__verse {
+  max-width: 22em;
+  font-family: var(--font-display);
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ink-2);
+}
+.slip__verse::before { content: "“"; }
+.slip__verse::after { content: "”"; }
+
+.slip__facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-top: 1px dashed var(--line-strong);
+  background: var(--surface);
+}
+.slip__facts > div { padding: 10px 6px; text-align: center; }
+.slip__facts > div + div { border-left: 1px dashed var(--line-strong); }
+.slip__facts dt { font-size: 11px; color: var(--ink-3); letter-spacing: .04em; }
+.slip__facts dd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.slip--hero .slip__menu { font-size: 26px; }
+.slip--hero .slip__verse { font-size: 15px; }
+.slip--hero .slip__facts dd { font-size: 12px; }
+
+.swatch {
+  display: inline-block;
+  width: 12px; height: 12px;
+  flex: none;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .12);
+}
+
+.spice { display: inline-flex; gap: 3px; }
+.spice i {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+.spice i.is-on { background: var(--brand); }
+
+/* ---------- กระบอกเซียมซี ---------- */
+.shake-stage { text-align: center; padding-block: 36px 40px; }
+.shaker {
+  position: relative;
+  width: 120px;
+  height: 200px;
+  margin: 24px auto 20px;
+}
+.shaker__tube, .shaker__sticks { transform-origin: 50% 100%; }
+.shaker__sticks {
+  position: absolute;
+  left: 24px; right: 24px; top: 8px;
+  display: flex;
+  justify-content: space-between;
+  height: 80px;
+}
+.shaker__sticks i {
+  width: 7px;
+  height: 100%;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(var(--gold), color-mix(in srgb, var(--gold) 70%, #6b4a1a));
+}
+.shaker__sticks i:nth-child(2) { height: 88%; margin-top: 10%; transform: rotate(-6deg); }
+.shaker__sticks i:nth-child(4) { height: 92%; margin-top: 6%; transform: rotate(5deg); }
+.shaker__tube {
+  position: absolute;
+  left: 14px; right: 14px; bottom: 0;
+  height: 130px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px 8px 16px 16px;
+  background: linear-gradient(90deg, var(--brand-hover), var(--brand) 45%, var(--brand-hover));
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--gold) 70%, transparent), var(--shadow-2);
+}
+.shaker__tube span {
+  writing-mode: vertical-rl;
+  color: var(--brand-ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: .1em;
+  opacity: .9;
+}
+.shaker__tube.is-shaking { animation: shake .42s ease-in-out infinite; }
+.shaker:has(.is-shaking) .shaker__sticks { animation: shake .42s ease-in-out infinite; }
+
+.shaker__drop {
+  position: absolute;
+  left: calc(50% - 4px);
+  top: 4px;
+  width: 8px;
+  height: 84px;
+  border-radius: 3px;
+  background: var(--gold);
+  opacity: 0;
+}
+.shaker__drop.is-dropping { animation: drop .65s ease-in forwards; }
+
+@keyframes shake {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-11deg) translateY(-4px); }
+  75% { transform: rotate(11deg) translateY(-4px); }
+}
+@keyframes drop {
+  0% { opacity: 1; transform: translateY(0); }
+  45% { opacity: 1; transform: translateY(-40px) rotate(-10deg); }
+  100% { opacity: 0; transform: translateY(-70px) translateX(30px) rotate(30deg); }
+}

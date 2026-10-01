@@ -1,0 +1,93 @@
+/* Design tokens — แก้สี ฟอนต์ และขนาดหลักของทั้งเว็บได้ที่ไฟล์นี้ไฟล์เดียว */
+:root {
+  color-scheme: light;
+
+  /* พื้นผิว */
+  --paper: #F6F1E9;
+  --paper-2: #EEE6D8;
+  --surface: #FFFFFF;
+  --surface-2: #FBF8F3;
+
+  /* ตัวอักษร */
+  --ink: #1E1915;
+  --ink-2: #5C534B;
+  --ink-3: #8A8076;
+
+  /* เส้น */
+  --line: #E4DBCD;
+  --line-strong: #CDBFAA;
+
+  /* สีแบรนด์ (แดงพริก) และสีรอง (ทองข้าวเหนียว) */
+  --brand: #B4361C;
+  --brand-hover: #982B14;
+  --brand-ink: #FFFFFF;
+  --brand-tint: #F7E3DA;
+  --gold: #C28A22;
+  --gold-tint: #F6EBD3;
+  --danger: #B42318;
+
+  /* สีประจำหมวดอาหาร */
+  --cat-noodle: #A8620E;  --cat-noodle-bg: #F7EAD5;
+  --cat-rice:   #5E6B2B;  --cat-rice-bg:   #ECEED8;
+  --cat-isan:   #B4361C;  --cat-isan-bg:   #F7E1D8;
+  --cat-grill:  #8A4A28;  --cat-grill-bg:  #F1E3D7;
+  --cat-sweet:  #A63F69;  --cat-sweet-bg:  #F7E1EA;
+  --cat-fusion: #2C6763;  --cat-fusion-bg: #DCECE9;
+  --cat-other:  #5C534B;  --cat-other-bg:  #EEE6D8;
+
+  /* ฟอนต์ */
+  --font-display: "Noto Serif Thai", "Noto Serif", Georgia, serif;
+  --font-body: "IBM Plex Sans Thai", "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* รูปทรง */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --shadow-1: 0 1px 2px rgba(30, 25, 21, .05), 0 1px 3px rgba(30, 25, 21, .04);
+  --shadow-2: 0 2px 4px rgba(30, 25, 21, .04), 0 12px 32px -12px rgba(30, 25, 21, .22);
+  --shadow-3: 0 24px 64px -16px rgba(30, 25, 21, .35);
+
+  --header-h: 64px;
+  --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+/* ธีมมืด */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #15110E; --paper-2: #1E1915; --surface: #1D1814; --surface-2: #191511;
+    --ink: #F2EBE2; --ink-2: #BCB1A5; --ink-3: #8B8076;
+    --line: #2F2822; --line-strong: #463C33;
+    --brand: #E7704E; --brand-hover: #F08767; --brand-ink: #1A0D08; --brand-tint: #3A1E15;
+    --gold: #E0B25A; --gold-tint: #33291A; --danger: #F27F73;
+    --cat-noodle: #E9A84E; --cat-noodle-bg: #33261A;
+    --cat-rice:   #BAC274; --cat-rice-bg:   #262A18;
+    --cat-isan:   #EE8366; --cat-isan-bg:   #3A1E16;
+    --cat-grill:  #D79A73; --cat-grill-bg:  #33231A;
+    --cat-sweet:  #E98DB1; --cat-sweet-bg:  #3A1B28;
+    --cat-fusion: #7CC4BC; --cat-fusion-bg: #16302D;
+    --cat-other:  #BCB1A5; --cat-other-bg:  #2A231E;
+    --shadow-1: 0 1px 2px rgba(0, 0, 0, .4);
+    --shadow-2: 0 12px 32px -12px rgba(0, 0, 0, .6);
+    --shadow-3: 0 24px 64px -16px rgba(0, 0, 0, .7);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #15110E; --paper-2: #1E1915; --surface: #1D1814; --surface-2: #191511;
+  --ink: #F2EBE2; --ink-2: #BCB1A5; --ink-3: #8B8076;
+  --line: #2F2822; --line-strong: #463C33;
+  --brand: #E7704E; --brand-hover: #F08767; --brand-ink: #1A0D08; --brand-tint: #3A1E15;
+  --gold: #E0B25A; --gold-tint: #33291A; --danger: #F27F73;
+  --cat-noodle: #E9A84E; --cat-noodle-bg: #33261A;
+  --cat-rice:   #BAC274; --cat-rice-bg:   #262A18;
+  --cat-isan:   #EE8366; --cat-isan-bg:   #3A1E16;
+  --cat-grill:  #D79A73; --cat-grill-bg:  #33231A;
+  --cat-sweet:  #E98DB1; --cat-sweet-bg:  #3A1B28;
+  --cat-fusion: #7CC4BC; --cat-fusion-bg: #16302D;
+  --cat-other:  #BCB1A5; --cat-other-bg:  #2A231E;
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, .4);
+  --shadow-2: 0 12px 32px -12px rgba(0, 0, 0, .6);
+  --shadow-3: 0 24px 64px -16px rgba(0, 0, 0, .7);
+}
