@@ -38,6 +38,7 @@
         <ul class="menu-list">
           <li><button type="button" class="menu-item" data-act="profile">${icon("user")}<span>แก้ไขโปรไฟล์</span>${icon("arrow", "menu-item__end")}</button></li>
           <li><button type="button" class="menu-item" data-act="my-reviews">${icon("pen")}<span>รีวิวของฉัน</span>${icon("arrow", "menu-item__end")}</button></li>
+          <li><button type="button" class="menu-item" data-act="streak">${icon("flame")}<span>สตรีคและป้ายสะสม</span>${icon("arrow", "menu-item__end")}</button></li>
           <li><button type="button" class="menu-item" data-act="favs">${icon("heart")}<span>ลิสต์ของฉัน</span>${icon("arrow", "menu-item__end")}</button></li>
           ${auth.isAdmin ? `<li><a class="menu-item" href="admin.html">${icon("shield")}<span>ตรวจรายงานรีวิว <span class="muted">(ผู้ดูแล)</span></span>${icon("arrow", "menu-item__end")}</a></li>` : ""}
         </ul>

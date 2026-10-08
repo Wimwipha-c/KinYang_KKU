@@ -596,3 +596,165 @@ select.input, .select {
 .confirm__body { margin-top: 8px; color: var(--ink-2); line-height: 1.7; overflow-wrap: anywhere; }
 .confirm__body b { color: var(--ink); }
 .confirm__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 24px; }
+.confirm__actions--single { grid-template-columns: 1fr; }
+
+/* ---------- ดวลเมนูประจำวัน ---------- */
+.section--duel { padding-bottom: 0; }
+@media (min-width: 768px) { .section--duel { padding-bottom: 0; } }
+.section--duel .section__head { align-items: flex-start; }
+
+.duel {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+@media (min-width: 768px) { .duel { gap: 20px; } }
+
+.duel__opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 20px 12px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+  text-align: center;
+  transition: border-color .2s, box-shadow .2s, transform .2s var(--ease);
+}
+.duel__opt:not([aria-disabled]):hover { border-color: var(--brand); box-shadow: var(--shadow-2); transform: translateY(-3px); }
+.duel__opt:not([aria-disabled]):active { transform: scale(.98); }
+.duel__opt[aria-disabled] { cursor: default; }
+.duel__opt.is-mine { border-color: var(--brand); background: color-mix(in srgb, var(--brand-tint) 55%, var(--surface)); }
+.duel__name {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 4.6vw, 24px);
+  font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.duel__price { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.duel__cta { margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--brand); }
+.duel__result { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; margin-top: 4px; }
+.duel__pct { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1.1; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.duel__opt.is-lead .duel__pct { color: var(--brand); }
+.duel__bar { height: 8px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
+.duel__bar i { display: block; height: 100%; border-radius: inherit; background: var(--line-strong); transition: width .6s var(--ease); }
+.duel__opt.is-lead .duel__bar i { background: var(--brand); }
+.duel__votes { font-size: 12px; color: var(--ink-3); }
+
+.duel__vs {
+  position: absolute;
+  left: 50%; top: 50%;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px; height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 0 0 5px var(--paper);
+  pointer-events: none;
+}
+
+/* ปุ่มสตรีคบนหัวส่วนดวล */
+.streak-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  filter: grayscale(.8);
+  transition: border-color .15s, filter .15s;
+}
+.streak-chip b { font-size: 16px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.streak-chip:hover { border-color: var(--ink-3); }
+.streak-chip.is-lit { filter: none; border-color: var(--gold); background: var(--gold-tint); }
+
+/* ---------- หน้าต่างสตรีค ---------- */
+.streak-hero {
+  display: grid;
+  justify-items: center;
+  padding: 8px 0 18px;
+  text-align: center;
+  filter: grayscale(.85);
+}
+.streak-hero.is-lit { filter: none; }
+.streak-hero__flame { font-size: 44px; line-height: 1; }
+.streak-hero__num { font-family: var(--font-display); font-size: 56px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.streak-hero__unit { font-weight: 600; color: var(--ink-2); }
+.streak-hero__note { max-width: 26em; margin-top: 8px; font-size: 14px; color: var(--ink-2); line-height: 1.6; }
+@media (prefers-reduced-motion: no-preference) {
+  .streak-hero.is-lit .streak-hero__flame { animation: flicker 1.6s ease-in-out infinite; }
+}
+@keyframes flicker { 50% { transform: scale(1.08) rotate(-3deg); } }
+
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; list-style: none; margin: 0 0 16px; padding: 0; }
+.week__day { display: grid; justify-items: center; gap: 4px; }
+.week__dot {
+  display: grid;
+  place-items: center;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--paper-2);
+  font-size: 18px;
+}
+.week__day.is-on .week__dot { background: var(--gold-tint); box-shadow: inset 0 0 0 1.5px var(--gold); }
+.week__day.is-today .week__dot { outline: 2px dashed var(--line-strong); outline-offset: 2px; }
+.week__label { font-size: 12px; color: var(--ink-3); }
+.week__day.is-today .week__label { font-weight: 600; color: var(--ink); }
+
+.streak-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 0 0 20px; }
+.streak-stats div { padding: 10px 14px; border-radius: var(--radius-sm); background: var(--surface-2); border: 1px solid var(--line); }
+.streak-stats dt { font-size: 12px; color: var(--ink-3); }
+.streak-stats dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.badges { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; list-style: none; margin: 0 0 20px; padding: 0; }
+@media (min-width: 480px) { .badges { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.badge {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 14px 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  text-align: center;
+}
+.badge__emoji { font-size: 30px; line-height: 1.2; filter: grayscale(1); opacity: .45; }
+.badge.is-done { border-color: var(--gold); background: var(--gold-tint); }
+.badge.is-done .badge__emoji { filter: none; opacity: 1; }
+.badge__name { font-weight: 600; font-size: 14px; }
+.badge__desc { font-size: 12px; color: var(--ink-3); line-height: 1.45; }
+.badge__bar { width: 100%; height: 5px; margin-top: 6px; border-radius: 999px; background: var(--paper-2); overflow: hidden; }
+.badge__bar i { display: block; height: 100%; background: var(--gold); border-radius: inherit; }
+.badge__prog { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* ---------- ชวนติดตั้งเป็นแอป ---------- */
+.install-wrap { padding-top: 20px; }
+.install-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px 12px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.install-card .logo__mark { flex: none; }
+.install-card__text { display: flex; flex-direction: column; flex: 1; min-width: 0; line-height: 1.4; font-size: 14px; }
+.install-card__text span { color: var(--ink-3); font-size: 13px; }

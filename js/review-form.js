@@ -182,6 +182,7 @@
 
     try {
       const shared = await KY.reviews.add(review);
+      if (KY.streak) KY.streak.record("review");
       rf.busy = false;
       close();
       KY.list.render();

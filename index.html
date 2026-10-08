@@ -12,6 +12,12 @@
   <meta property="og:description" content="รีวิวร้านอาหารรอบ มข. และเซียมซีช่วยเลือกเมนู">
   <meta property="og:locale" content="th_TH">
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="กินหยัง">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <script>
     /* ใส่ธีมที่ผู้ใช้เลือกไว้ก่อนหน้าเว็บจะแสดง เพื่อไม่ให้จอกะพริบ */
     try { var t = JSON.parse(localStorage.getItem("kky_theme")); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
@@ -34,6 +40,7 @@
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
     <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3.5 12.5h17a8.5 7.5 0 0 1-17 0z"/><path d="M6.8 12.5a5.2 4.2 0 0 1 10.4 0"/><path d="M9 21h6"/><path d="m13.2 9.6 3.6-7M15.6 10.2l5-5.6"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.3 2.3-5.4 3.8-7.3.4 1.9 1.4 3 2.6 3.4-.2-3 1.3-5.6 3.6-7.4.1 2.9 1.5 4.6 2.8 6.4 1 1.4 1.7 3 1.7 4.9 0 3.6-2.6 6.2-6.5 6.2z"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
     <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3.6l2.55 5.2 5.7.83-4.13 4.03.98 5.69L12 16.67l-5.1 2.68.98-5.69L3.75 9.63l5.7-.83z"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
@@ -124,6 +131,28 @@
       </div>
     </section>
 
+    <!-- ดวลเมนูประจำวัน: สร้างโดย js/duel.js (ซ่อนไว้ถ้าไม่ได้เชื่อมฐานข้อมูลกลาง) -->
+    <section class="section section--duel container" id="duel" aria-labelledby="duelTitle" hidden>
+      <div class="section__head">
+        <div>
+          <h2 class="section__title" id="duelTitle">ดวลเมนูประจำวัน</h2>
+          <p class="section__meta" id="duelMeta" aria-live="polite"></p>
+        </div>
+        <span id="streakChip"></span>
+      </div>
+      <div class="duel" id="duelBoard"></div>
+    </section>
+
+    <!-- ชวนติดตั้งเป็นแอป: แสดงโดย js/pwa.js เมื่อเครื่องรองรับ -->
+    <div class="container install-wrap" id="installCard" hidden>
+      <div class="install-card">
+        <span class="logo__mark" aria-hidden="true"><svg class="icon"><use href="#i-logo"/></svg></span>
+        <span class="install-card__text"><b>ติดตั้งกินหยังไว้บนหน้าจอ</b><span>เปิดได้ในแตะเดียว เหมือนแอป</span></span>
+        <button type="button" class="btn btn-primary btn-sm" data-act="install">ติดตั้ง</button>
+        <button type="button" class="icon-btn icon-btn--sm" data-act="install-dismiss" aria-label="ไม่ใช่ตอนนี้"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+    </div>
+
     <!-- เมนูยอดฮิตประจำสัปดาห์: สร้างโดย js/trending.js (ซ่อนไว้จนกว่าจะมีข้อมูล) -->
     <section class="section section--trending container" id="trending" aria-labelledby="trendingTitle" hidden>
       <div class="section__head">
@@ -192,6 +221,9 @@
   <div class="modal" id="profileModal" role="dialog" aria-modal="true" aria-labelledby="profileTitle">
     <div class="modal__panel" id="profileBody"></div>
   </div>
+  <div class="modal" id="streakModal" role="dialog" aria-modal="true" aria-labelledby="streakTitle">
+    <div class="modal__panel" id="streakBody"></div>
+  </div>
   <div class="modal" id="accountModal" role="dialog" aria-modal="true" aria-labelledby="accountTitle">
     <div class="modal__panel" id="accountBody"></div>
   </div>
@@ -213,6 +245,9 @@
   <script src="js/report.js" defer></script>
   <script src="js/profile.js" defer></script>
   <script src="js/account.js" defer></script>
+  <script src="js/streak.js" defer></script>
+  <script src="js/duel.js" defer></script>
+  <script src="js/pwa.js" defer></script>
   <script src="js/share-image.js" defer></script>
   <script src="js/fortune.js" defer></script>
   <script src="js/review-form.js" defer></script>

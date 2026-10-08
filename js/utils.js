@@ -43,5 +43,10 @@
     return `<span class="stars ${cls}" role="img" aria-label="${n} จาก 5 ดาว">${out}</span>`;
   };
 
-  KY.utils = { $, $$, esc, storage, reducedMotion, sleep, pick, formatDate, thaiDigits, hasPrice, priceSortValue, icon, stars };
+  // วันที่ตามเวลาไทย (UTC+7 ไม่มี daylight saving) ในรูป "YYYY-MM-DD" ใช้นับวันของดวล/สตรีคให้ตรงกันทุกเครื่อง
+  const BKK_MS = 7 * 3600 * 1000, DAY_MS = 864e5;
+  const bkkDay = (offset = 0) => new Date(Date.now() + BKK_MS + offset * DAY_MS).toISOString().slice(0, 10);
+  const msToBkkMidnight = () => DAY_MS - ((Date.now() + BKK_MS) % DAY_MS);
+
+  KY.utils = { $, $$, esc, storage, reducedMotion, sleep, pick, formatDate, thaiDigits, hasPrice, priceSortValue, icon, stars, bkkDay, msToBkkMidnight };
 })(window.KY = window.KY || {});

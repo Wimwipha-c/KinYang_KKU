@@ -253,3 +253,64 @@ create policy "Authors can delete own reviews"
   on public.reviews for delete
   to authenticated
   using (user_id = auth.uid());
+
+
+-- ===================================================================
+-- v4: ดวลเมนูประจำวัน และสตรีค (วันที่เข้ามาใช้งานติดกัน)
+-- รันซ้ำได้ ไม่ทำให้ข้อมูลเดิมหาย
+-- ===================================================================
+
+-- โหวตดวลเมนู: วันละ 1 โหวตต่อคน (นับวันตามเวลาไทย)
+-- voter = 'u:<user id>' เมื่อเข้าสู่ระบบ หรือ 'd:<รหัสสุ่มของเครื่อง>' สำหรับ guest
+-- คู่เมนูของแต่ละวันคำนวณในหน้าเว็บจากวันที่ (ทุกเครื่องได้คู่เดียวกัน) ตารางนี้เก็บแค่ชื่อเมนูที่โหวต
+create table if not exists public.duel_votes (
+  id          bigint generated always as identity primary key,
+  day         date not null,
+  menu        text not null check (char_length(menu) between 1 and 60),
+  voter       text not null check (char_length(voter) between 3 and 80),
+  created_at  timestamptz not null default now(),
+  unique (day, voter)
+);
+alter table public.duel_votes enable row level security;
+grant insert on public.duel_votes to anon, authenticated;
+
+-- โหวตได้เฉพาะวันนี้ (เผื่อเมื่อวานไว้ 1 วันสำหรับคนที่โหวตคร่อมเที่ยงคืน) และห้ามโหวตในนามบัญชีคนอื่น
+drop policy if exists "Anyone can vote in today's duel" on public.duel_votes;
+create policy "Anyone can vote in today's duel"
+  on public.duel_votes for insert
+  to anon, authenticated
+  with check (
+    day between (now() at time zone 'Asia/Bangkok')::date - 1 and (now() at time zone 'Asia/Bangkok')::date
+    and (voter not like 'u:%' or voter = 'u:' || auth.uid()::text)
+  );
+
+-- ผลโหวตรวมของวัน (อ่านทีละแถวไม่ได้ ต้องดูผ่านฟังก์ชันนี้)
+create or replace function public.duel_results(d date)
+returns table (menu text, votes bigint)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select dv.menu, count(*) from public.duel_votes dv where dv.day = d group by dv.menu;
+$$;
+revoke all on function public.duel_results(date) from public;
+grant execute on function public.duel_results(date) to anon, authenticated;
+
+-- วันที่ใช้งาน (สำหรับสตรีคและป้าย): เห็นและแก้ได้เฉพาะเจ้าของ
+-- kinds = กิจกรรมของวันนั้น: fortune (เสี่ยงเซียมซี), duel (โหวตดวล), review (เขียนรีวิว)
+create table if not exists public.activity_days (
+  user_id  uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  day      date not null check (day >= date '2026-01-01'),
+  kinds    text[] not null default '{}' check (kinds <@ array['fortune', 'duel', 'review']::text[]),
+  primary key (user_id, day)
+);
+alter table public.activity_days enable row level security;
+grant select, insert, update on public.activity_days to authenticated;
+
+drop policy if exists "Users manage own activity" on public.activity_days;
+create policy "Users manage own activity"
+  on public.activity_days for all
+  to authenticated
+  using (user_id = auth.uid())
+  with check (user_id = auth.uid() and day <= (now() at time zone 'Asia/Bangkok')::date + 1);

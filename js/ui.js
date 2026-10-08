@@ -74,13 +74,13 @@
       <span class="confirm__icon${danger ? " confirm__icon--danger" : ""}">${KY.utils.icon(iconName)}</span>
       <h2 class="confirm__title" id="confirmTitle">${title}</h2>
       ${body ? `<p class="confirm__body" id="confirmBody">${body}</p>` : ""}
-      <div class="confirm__actions">
-        <button type="button" class="btn btn-secondary btn-lg" data-confirm="no">${cancelText}</button>
+      <div class="confirm__actions${cancelText === null ? " confirm__actions--single" : ""}">
+        ${cancelText === null ? "" : `<button type="button" class="btn btn-secondary btn-lg" data-confirm="no">${cancelText}</button>`}
         <button type="button" class="btn ${danger ? "btn-danger" : "btn-primary"} btn-lg" data-confirm="yes">${confirmText}</button>
       </div>`;
     return new Promise(resolve => {
       pendingConfirm = resolve;
-      openModal(CONFIRM_ID, '[data-confirm="no"]');   // โฟกัสที่ยกเลิกก่อน กันกดลบพลาด
+      openModal(CONFIRM_ID, cancelText === null ? '[data-confirm="yes"]' : '[data-confirm="no"]');   // โฟกัสที่ยกเลิกก่อน กันกดลบพลาด
     });
   }
 
